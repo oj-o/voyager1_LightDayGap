@@ -1,9 +1,8 @@
 /* =================================================================
    "Light-Day Gap" - 1-Minute Generative Audiovisual Artwork Engine
-   - 60-Second Structured Playtime Cycle
-   - Bottom Control Toolbar & Random Variation Generator
-   - Generative Web Audio Synthesizer
-   - MediaRecorder 1-Minute Video Export (.webm)
+   - Pure Visual Animation (Auto-plays on screen)
+   - English Bottom Controls (PAUSE, SOUND ON/OFF, RANDOM, EXPORT)
+   - 60-Second Playtime Cycle with Procedural Random Art Seeds
    ================================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,9 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let isMuted = false;
   let animationFrameId = null;
 
-  // =========================================================
-  // Generative Randomization State (Randomized on each run)
-  // =========================================================
+  // Generative Randomization State
   const PALETTES = [
     { name: 'Aurora Cyan', primary: '#00f0ff', secondary: '#ffc83b', accent: '#7c3aed', bgGrad: '#01040f' },
     { name: 'Solar Magenta', primary: '#e056fd', secondary: '#ff9f43', accent: '#00d2d3', bgGrad: '#0a010f' },
@@ -51,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     baseFreq: 55, // A1
     waveCount: 6,
     starCount: 400,
-    monadShape: 4, // 4 = Diamond/Square, 3 = Triangle, 6 = Hexagon
-    waveSpeed: 1.0
+    monadShape: 4
   };
 
   let stars = [];
@@ -72,20 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function randomizeArt() {
     const paletteIndex = Math.floor(Math.random() * PALETTES.length);
     currentSeed.palette = PALETTES[paletteIndex];
-    currentSeed.bpm = 60 + Math.floor(Math.random() * 24); // 60 - 84 BPM
-    currentSeed.baseFreq = [43.65, 55.0, 65.41, 73.42][Math.floor(Math.random() * 4)]; // F1, A1, C2, D2
+    currentSeed.bpm = 60 + Math.floor(Math.random() * 24);
+    currentSeed.baseFreq = [43.65, 55.0, 65.41, 73.42][Math.floor(Math.random() * 4)];
     currentSeed.waveCount = 4 + Math.floor(Math.random() * 5);
     currentSeed.monadShape = [3, 4, 6][Math.floor(Math.random() * 3)];
-    currentSeed.waveSpeed = 0.8 + Math.random() * 0.4;
 
     generateStars();
     resetAudioPulseTimer();
     startTime = Date.now();
   }
 
-  // =========================================================
-  // Generative Web Audio API Engine
-  // =========================================================
+  // Web Audio API Synthesizer
   let audioCtx = null;
   let masterGain = null;
   let droneOsc1 = null;
@@ -103,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
       masterGain.gain.setValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime);
       masterGain.connect(audioCtx.destination);
 
-      // Deep Space Base Drone
       droneOsc1 = audioCtx.createOscillator();
       droneOsc1.type = 'sawtooth';
       droneOsc1.frequency.setValueAtTime(currentSeed.baseFreq, audioCtx.currentTime);
@@ -124,9 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       droneOsc2.start();
 
       resetAudioPulseTimer();
-    } catch (e) {
-      console.warn("Audio Context init error:", e);
-    }
+    } catch (e) {}
   }
 
   function resetAudioPulseTimer() {
@@ -134,24 +124,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const intervalMs = Math.floor((60 / currentSeed.bpm) * 1000);
     pulseTimer = setInterval(() => {
       if (audioCtx && isPlaying && !isMuted) {
-        playHumanBiologicalPulse();
+        playHumanPulseSound();
       }
     }, intervalMs);
   }
 
-  function playHumanBiologicalPulse() {
+  function playHumanPulseSound() {
     if (!audioCtx) return;
     try {
       const now = audioCtx.currentTime;
 
-      // Heartbeat Sub-Kick Sound
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(90, now);
       osc.frequency.exponentialRampToValueAtTime(30, now + 0.16);
 
-      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.setValueAtTime(0.2, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
       osc.connect(gain);
@@ -160,14 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
       osc.start(now);
       osc.stop(now + 0.16);
 
-      // Clock Tick Harmonic Sparkle
       const tick = audioCtx.createOscillator();
       const tickGain = audioCtx.createGain();
       tick.type = 'triangle';
       tick.frequency.setValueAtTime(1400, now);
       tick.frequency.exponentialRampToValueAtTime(500, now + 0.03);
 
-      tickGain.gain.setValueAtTime(0.04, now);
+      tickGain.gain.setValueAtTime(0.03, now);
       tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
 
       tick.connect(tickGain);
@@ -178,14 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   }
 
-  function play1LightDayEchoSound() {
+  function playLightEchoSound() {
     if (!audioCtx || isMuted) return;
     try {
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
-      const freq = currentSeed.baseFreq * 8; // High crystalline overtone
+      const freq = currentSeed.baseFreq * 8;
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, now);
       osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 1.5);
@@ -201,11 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   }
 
-  // =========================================================
-  // Canvas Rendering Engine (60-Second Playtime Cycle)
-  // =========================================================
-  generateStars();
+  // Audio start on first click anywhere
+  document.body.addEventListener('click', () => {
+    if (!audioCtx) initAudio();
+  }, { once: true });
 
+  // Main Canvas Render Loop (Auto-plays)
+  generateStars();
   let lastEchoTriggered = false;
 
   function render(timestamp) {
@@ -217,15 +207,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const w = canvas.width;
     const h = canvas.height;
     const elapsed = (Date.now() - startTime) % CYCLE_DURATION;
-    const cycleT = elapsed / CYCLE_DURATION; // 0.0 to 1.0 across 60 seconds
+    const cycleT = elapsed / CYCLE_DURATION;
 
-    // Dark Cosmic Background Gradient
+    // Dark Background Gradient
     ctx.fillStyle = currentSeed.palette.bgGrad;
     ctx.globalAlpha = 0.25;
     ctx.fillRect(0, 0, w, h);
     ctx.globalAlpha = 1.0;
 
-    // Render Generative Starfield
+    // Render Starfield
     stars.forEach(s => {
       s.x -= s.speed;
       if (s.x < 0) s.x = 1;
@@ -240,17 +230,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.globalAlpha = 1.0;
 
     // Abstract Nodes
-    const humanX = w * 0.18;      // Left: Earth / Human Time Node
+    const humanX = w * 0.18;
     const humanY = h * 0.5;
-
-    const distantX = w * 0.82;    // Right: 1 Light-Day Distant Monad
+    const distantX = w * 0.82;
     const distantY = h * 0.5;
 
-    // ---------------------------------------------------
     // 1. Human Time Node (Warm Biological Core)
-    // ---------------------------------------------------
     const pulseFactor = Math.sin(timestamp * 0.008) * 0.15 + 1.0;
-    
+
     const humanGlow = ctx.createRadialGradient(humanX, humanY, 5, humanX, humanY, 150 * pulseFactor);
     humanGlow.addColorStop(0, currentSeed.palette.secondary);
     humanGlow.addColorStop(0.5, 'rgba(255, 100, 0, 0.2)');
@@ -279,13 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(humanX, humanY, 12 * pulseFactor, 0, Math.PI * 2);
     ctx.fill();
 
-    // ---------------------------------------------------
-    // 2. Light Wave Dilation across 1 Light-Day (60s Progress)
-    // ---------------------------------------------------
+    // 2. Light Wave Dilation (60s Progress across 1 Light-Day)
     const distTotal = distantX - humanX;
     const currentLightX = humanX + distTotal * cycleT;
 
-    // Concentric Wave Fronts (Diatonic Dilation)
     for (let i = 0; i < currentSeed.waveCount; i++) {
       const waveT = (cycleT - i * (0.8 / currentSeed.waveCount) + 1) % 1;
       const waveX = humanX + distTotal * waveT;
@@ -301,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     ctx.globalAlpha = 1.0;
 
-    // Speed of Light Front Spark
+    // Speed of Light Spark
     const sparkGlow = ctx.createRadialGradient(currentLightX, humanY, 2, currentLightX, humanY, 40);
     sparkGlow.addColorStop(0, '#ffffff');
     sparkGlow.addColorStop(0.4, currentSeed.palette.primary);
@@ -311,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(currentLightX, humanY, 40, 0, Math.PI * 2);
     ctx.fill();
 
-    // Connecting Gravitational Line
+    // Connecting String
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -319,12 +303,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.lineTo(distantX, distantY);
     ctx.stroke();
 
-    // ---------------------------------------------------
-    // 3. 1 Light-Day Monad Node & Echo Effect (At 50s-60s)
-    // ---------------------------------------------------
+    // 3. 1 Light-Day Monad Node & Echo Effect
     const isWaveArriving = cycleT > 0.85;
     if (isWaveArriving && !lastEchoTriggered) {
-      play1LightDayEchoSound();
+      playLightEchoSound();
       lastEchoTriggered = true;
     } else if (!isWaveArriving) {
       lastEchoTriggered = false;
@@ -341,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(distantX, distantY, 110 * monadScale, 0, Math.PI * 2);
     ctx.fill();
 
-    // Polygon Shape Monad (Triangle, Square, or Hexagon)
+    // Polygon Monad
     ctx.save();
     ctx.translate(distantX, distantY);
     ctx.rotate(timestamp * 0.0005);
@@ -366,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(distantX, distantY, 6 * monadScale, 0, Math.PI * 2);
     ctx.fill();
 
-    // 1 Light-Day Echo Wave Propagation back
+    // Echo Wave
     if (isWaveArriving) {
       const echoProgress = (cycleT - 0.85) / 0.15;
       ctx.strokeStyle = currentSeed.palette.accent;
@@ -383,11 +365,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   animationFrameId = requestAnimationFrame(render);
 
-  // Controls Event Listeners
+  // English Button Event Controls
   btnPlayPause.addEventListener('click', () => {
     isPlaying = !isPlaying;
-    playIcon.textContent = isPlaying ? "⏸ 일시정지" : "▶ 재생";
-    btnPlayPause.classList.toggle('active', isPlaying);
+    playIcon.textContent = isPlaying ? "PAUSE" : "PLAY";
   });
 
   btnSound.addEventListener('click', () => {
@@ -399,15 +380,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (masterGain) {
       masterGain.gain.linearRampToValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime + 0.3);
     }
-    soundIcon.textContent = isMuted ? "🔇 사운드 켜기" : "🔊 사운드 끄기";
-    btnSound.classList.toggle('active', !isMuted);
+    soundIcon.textContent = isMuted ? "SOUND OFF" : "SOUND ON";
   });
 
   btnRandomize.addEventListener('click', () => {
     randomizeArt();
   });
 
-  // 1-Minute Video Recorder (.webm)
+  // 1-Minute Video Recording (.webm)
   btnExportVideo.addEventListener('click', async () => {
     initAudio();
     if (audioCtx && audioCtx.state === 'suspended') {
@@ -459,9 +439,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
       };
 
-      // Restart 1-minute cycle from 0
       startTime = Date.now();
       isPlaying = true;
+      playIcon.textContent = "PAUSE";
       mediaRecorder.start();
 
       const recInterval = setInterval(() => {
@@ -478,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 250);
 
     } catch (err) {
-      alert("영상 녹화 중 오류: " + err.message);
+      alert("Recording error: " + err.message);
       renderModal.classList.remove('show');
     }
   });

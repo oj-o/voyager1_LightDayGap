@@ -1,6 +1,5 @@
 /* ==========================================
-   Abstract Audiovisual Artwork: "Light-Day Gap"
-   Bottom Floating Toolbar & Fullscreen Canvas
+   "Light-Day Gap" - Pure Artwork & Bottom English Controls
    ========================================== */
 
 :root {
@@ -8,9 +7,8 @@
   --accent-cyan: #00f0ff;
   --accent-gold: #ffc83b;
   --accent-magenta: #e056fd;
-  --glass-bg: rgba(6, 12, 26, 0.75);
+  --glass-bg: rgba(6, 12, 26, 0.7);
   --glass-border: rgba(0, 240, 255, 0.25);
-  --font-main: 'Noto Sans KR', sans-serif;
   --font-display: 'Orbitron', sans-serif;
 }
 
@@ -21,11 +19,11 @@
 }
 
 html, body {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background-color: var(--bg-dark);
-  font-family: var(--font-main);
+  font-family: var(--font-display);
 }
 
 #artCanvas {
@@ -34,10 +32,10 @@ html, body {
   display: block;
 }
 
-/* Bottom Floating Control Toolbar */
+/* Floating Toolbar at Absolute Bottom Edge */
 .bottom-toolbar {
   position: fixed;
-  bottom: 24px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -47,57 +45,55 @@ html, body {
 .toolbar-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
-  padding: 10px 22px;
+  padding: 8px 18px;
   border-radius: 40px;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.15);
 }
 
 .ctrl-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #e2e8f0;
-  padding: 10px 18px;
-  border-radius: 30px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.25s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .ctrl-btn:hover {
   background: rgba(0, 240, 255, 0.2);
   border-color: var(--accent-cyan);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
   color: #fff;
 }
 
 .ctrl-btn.main-play {
   background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
   color: #000;
-  font-weight: 700;
   border: none;
 }
 
 .ctrl-btn.main-play:hover {
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
 }
 
 .ctrl-btn.rand-btn {
-  background: linear-gradient(135deg, rgba(224, 86, 253, 0.3), rgba(120, 0, 255, 0.4));
+  background: linear-gradient(135deg, rgba(224, 86, 253, 0.35), rgba(120, 0, 255, 0.45));
   border-color: var(--accent-magenta);
   color: #fff;
 }
 
 .ctrl-btn.rand-btn:hover {
-  box-shadow: 0 0 25px rgba(224, 86, 253, 0.6);
+  box-shadow: 0 0 20px rgba(224, 86, 253, 0.6);
 }
 
 .ctrl-btn.record-btn {
@@ -107,10 +103,10 @@ html, body {
 }
 
 .ctrl-btn.record-btn:hover {
-  box-shadow: 0 0 25px rgba(255, 56, 96, 0.7);
+  box-shadow: 0 0 20px rgba(255, 56, 96, 0.7);
 }
 
-/* Render Modal Overlay */
+/* Minimal Render Modal Overlay */
 .render-modal {
   position: fixed;
   top: 0;
@@ -136,30 +132,30 @@ html, body {
 .render-card {
   background: rgba(10, 20, 40, 0.9);
   border: 1px solid var(--accent-cyan);
-  padding: 40px;
+  padding: 35px 45px;
   border-radius: 20px;
   text-align: center;
-  max-width: 460px;
+  max-width: 360px;
   box-shadow: 0 0 50px rgba(0, 240, 255, 0.3);
   color: #fff;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(0, 240, 255, 0.2);
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(0, 240, 255, 0.2);
   border-top-color: var(--accent-cyan);
   border-radius: 50%;
   animation: spin 1s infinite linear;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 15px auto;
 }
 
 .progress-bar-wrap {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  margin: 20px 0 10px 0;
+  border-radius: 3px;
+  margin: 15px 0 10px 0;
   overflow: hidden;
 }
 
@@ -170,14 +166,12 @@ html, body {
   transition: width 0.2s ease;
 }
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
+.status-num {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--accent-cyan);
 }
 
-@media (max-width: 600px) {
-  .toolbar-card {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 10px 14px;
-  }
+@keyframes spin {
+  100% { transform: rotate(360deg); }
 }
