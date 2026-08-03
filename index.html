@@ -3,62 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>보이저 1호 1광일 여정 시각화 - Voyager 1 Interstellar Journey</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <title>Light-Day Gap (1광일의 시간차)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Pure Video Frame Container (No On-screen Text overlays) -->
-  <div class="video-container" id="videoContainer">
-    <canvas id="spaceCanvas"></canvas>
-
-    <!-- Minimal UI Overlay Layer (Playback & Audio Controls only) -->
-    <div class="video-overlay" id="videoOverlay">
-      
-      <!-- Top Live Audio Status -->
-      <div class="top-bar">
-        <div class="audio-status-badge" id="audioBadge">
-          <span class="pulse-dot">●</span>
-          <span class="status-text">DEEP SPACE AUDIO ACTIVE</span>
-        </div>
-      </div>
-
-      <!-- Bottom Control Toolbar -->
-      <div class="bottom-toolbar">
-        <div class="action-controls">
-          <button id="btnPlayPause" class="ctrl-btn main-play">
-            <span id="playIcon">▶ 재생</span>
-          </button>
-          <button id="btnSound" class="ctrl-btn active">
-            <span id="soundIcon">🔊 사운드 켜기</span>
-          </button>
-          <button id="btnExportVideo" class="ctrl-btn record-btn">
-            <span id="recordIcon">🎬 영상 다운로드 (.webm)</span>
-          </button>
-          <button id="btnFullscreen" class="ctrl-btn">
-            <span>⛶ 전체화면</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Render Progress Overlay during Video Recording -->
-      <div class="render-modal" id="renderModal">
-        <div class="render-card">
-          <div class="spinner"></div>
-          <h3>순수 영상 & 음향 인코딩 중...</h3>
-          <p>지구에서 1광일 거리까지의 시각화 모션과 우주 사운드를 녹화합니다.</p>
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill" id="renderProgress"></div>
-          </div>
-          <span id="renderStatusText">0%</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
+  <!-- Pure Canvas Artwork (Zero UI, Zero Text, Zero Buttons) -->
+  <canvas id="artCanvas"></canvas>
 
   <script src="script.js"></script>
 </body>
