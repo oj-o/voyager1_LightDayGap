@@ -1,20 +1,14 @@
-/* ===================================================
-   Voyager 1 Light-Day Teaser Engine
-   Canvas Space Renderer, Web Audio Synth, MediaRecorder
-   =================================================== */
+/* =================================================================
+   Voyager 1 Light-Day Pure Visualization & Deep Space Audio Engine
+   - Pure Visual Motion (No On-screen Text)
+   - 1 Light-Day Earth to Voyager Signal Propagation Motion
+   - Web Audio API Procedural Deep Space Sound Synth
+   - MediaRecorder Video Exporter (.webm)
+   ================================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements
   const canvas = document.getElementById('spaceCanvas');
   const ctx = canvas.getContext('2d');
-  
-  const captionMain = document.getElementById('captionMain');
-  const captionSub = document.getElementById('captionSub');
-  const sceneTag = document.getElementById('sceneTag');
-  const distanceVal = document.getElementById('distanceVal');
-  
-  const goldenRecordOverlay = document.getElementById('goldenRecordOverlay');
-  const signalPulseContainer = document.getElementById('signalPulseContainer');
   
   const btnPlayPause = document.getElementById('btnPlayPause');
   const playIcon = document.getElementById('playIcon');
@@ -23,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnExportVideo = document.getElementById('btnExportVideo');
   const btnFullscreen = document.getElementById('btnFullscreen');
   
-  const sceneBtns = document.querySelectorAll('.scene-btn');
   const renderModal = document.getElementById('renderModal');
   const renderProgress = document.getElementById('renderProgress');
   const renderStatusText = document.getElementById('renderStatusText');
@@ -36,113 +29,59 @@ document.addEventListener('DOMContentLoaded', () => {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // Video Story Scenes
-  const SCENES = [
-    {
-      id: 0,
-      tag: "SCENE 01 / LAUNCH 1977",
-      main: "1977년 9월 5일",
-      sub: "지구를 떠나 광활한 태양계 탐사에 나선 인류의 최전방 척후병, 보이저 1호",
-      duration: 4000,
-      camZoom: 1.2,
-      voyagerSpeed: 0.5,
-      showSignal: false,
-      showRecord: false,
-      distanceBase: 0
-    },
-    {
-      id: 1,
-      tag: "SCENE 02 / 1 LIGHT-DAY MILESTONE",
-      main: "49년 만의 위대한 이정표",
-      sub: "2026년 11월 18일, 지구로부터 인류 최초로 '1광일(259억 km)' 거리를 통과한다!",
-      duration: 5000,
-      camZoom: 0.8,
-      voyagerSpeed: 1.2,
-      showSignal: false,
-      showRecord: false,
-      distanceBase: 25902068356
-    },
-    {
-      id: 2,
-      tag: "SCENE 03 / 48-HOUR COMMUNICATION DELAY",
-      main: "빛의 속도로 꼬박 이틀",
-      sub: "월요일 아침 '안녕'이라는 명령을 보내면, 수요일 아침이 되어서야 응답을 수신한다",
-      duration: 5000,
-      camZoom: 0.6,
-      voyagerSpeed: 0.3,
-      showSignal: true,
-      showRecord: false,
-      distanceBase: 25902068356
-    },
-    {
-      id: 3,
-      tag: "SCENE 04 / POWER DEPLETION & SILENCE",
-      main: "식어가는 원자력 전력",
-      sub: "10개 과학장비 중 단 2개만 가동 중... 2030년대 초, 마지막 통신이 끊어진다",
-      duration: 4500,
-      camZoom: 1.5,
-      voyagerSpeed: 0.2,
-      showSignal: false,
-      showRecord: false,
-      distanceBase: 25980000000
-    },
-    {
-      id: 4,
-      tag: "SCENE 05 / GOLDEN RECORD TIME CAPSULE",
-      main: "영원한 인류의 타임캡슐",
-      sub: "지구의 소리, 50개 언어 인사말, 음악을 담은 '골든 레코드'를 싣고 우주 속으로",
-      duration: 4500,
-      camZoom: 1.0,
-      voyagerSpeed: 0.4,
-      showSignal: false,
-      showRecord: true,
-      distanceBase: 26050000000
-    },
-    {
-      id: 5,
-      tag: "SCENE 06 / EPILOGUE",
-      main: "인류가 도달한 가장 먼 우주",
-      sub: "통신이 끊겨도 보이저 1호는 광활한 성간 공간을 외로이, 영원히 항해할 것이다",
-      duration: 4000,
-      camZoom: 0.5,
-      voyagerSpeed: 1.5,
-      showSignal: false,
-      showRecord: false,
-      distanceBase: 26100000000
-    }
-  ];
-
-  let currentSceneIndex = 0;
-  let sceneStartTime = Date.now();
+  // Global Timeline (Total Cycle: 30 Seconds = 30,000 ms)
+  const TOTAL_DURATION = 30000;
+  let startTime = Date.now();
   let isPlaying = true;
-  let isMuted = true;
+  let isMuted = false;
   let animationFrameId = null;
 
-  // Starfield Data
-  const STARS_COUNT = 300;
+  // Starfield & Cosmic Dust Data
+  const STARS_COUNT = 450;
   const stars = [];
   for (let i = 0; i < STARS_COUNT; i++) {
     stars.push({
-      x: Math.random() * 2000 - 1000,
-      y: Math.random() * 2000 - 1000,
+      x: (Math.random() - 0.5) * 3000,
+      y: (Math.random() - 0.5) * 3000,
+      z: Math.random() * 2000 + 1,
       size: Math.random() * 2 + 0.5,
       alpha: Math.random() * 0.8 + 0.2,
-      twinkleSpeed: Math.random() * 0.03 + 0.01
+      twinkleSpeed: Math.random() * 0.05 + 0.01,
+      color: ['#ffffff', '#aee5ff', '#ffdca8', '#c4b5fd'][Math.floor(Math.random() * 4)]
     });
   }
 
-  // Nebula Cloud Particles
+  // Solar Wind Particles
+  const PARTICLES_COUNT = 80;
+  const particles = [];
+  for (let i = 0; i < PARTICLES_COUNT; i++) {
+    particles.push({
+      x: Math.random() * 2000 - 1000,
+      y: Math.random() * 2000 - 1000,
+      speed: Math.random() * 4 + 2,
+      length: Math.random() * 40 + 10,
+      alpha: Math.random() * 0.4 + 0.1
+    });
+  }
+
+  // Nebulae Clouds
   const NEBULAE = [
-    { x: -300, y: -150, radius: 400, color: 'rgba(0, 150, 255, 0.08)' },
-    { x: 400, y: 200, radius: 500, color: 'rgba(120, 0, 255, 0.06)' },
-    { x: 100, y: -300, radius: 350, color: 'rgba(255, 100, 0, 0.04)' }
+    { x: -500, y: -300, radius: 600, color: 'rgba(0, 180, 255, 0.07)' },
+    { x: 600, y: 300, radius: 700, color: 'rgba(140, 0, 255, 0.05)' },
+    { x: 200, y: -400, radius: 500, color: 'rgba(255, 120, 0, 0.04)' }
   ];
 
-  // Web Audio API Synthesizer Engine
+  // ==========================================
+  // Web Audio API Synthesizer (Deep Space Sound)
+  // ==========================================
   let audioCtx = null;
-  let mainDroneGain = null;
-  let synthOsc1 = null;
-  let synthOsc2 = null;
+  let masterGain = null;
+  let droneOsc1 = null;
+  let droneOsc2 = null;
+  let droneFilter = null;
+  let noiseNode = null;
+  let noiseGain = null;
+  let telemetryInterval = null;
 
   function initAudio() {
     if (audioCtx) return;
@@ -150,36 +89,63 @@ document.addEventListener('DOMContentLoaded', () => {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioCtx = new AudioContext();
 
-      // Main Gain Node
-      mainDroneGain = audioCtx.createGain();
-      mainDroneGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      mainDroneGain.connect(audioCtx.destination);
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime);
+      masterGain.connect(audioCtx.destination);
 
-      // Low Space Synth Oscillators
-      synthOsc1 = audioCtx.createOscillator();
-      synthOsc1.type = 'sawtooth';
-      synthOsc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 note
+      // Deep Sub-Bass Space Hum (43.65Hz F0 / 87.31Hz F1)
+      droneOsc1 = audioCtx.createOscillator();
+      droneOsc1.type = 'sawtooth';
+      droneOsc1.frequency.setValueAtTime(43.65, audioCtx.currentTime);
 
-      synthOsc2 = audioCtx.createOscillator();
-      synthOsc2.type = 'sine';
-      synthOsc2.frequency.setValueAtTime(110, audioCtx.currentTime); // A2 note
+      droneOsc2 = audioCtx.createOscillator();
+      droneOsc2.type = 'sine';
+      droneOsc2.frequency.setValueAtTime(87.31, audioCtx.currentTime);
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(220, audioCtx.currentTime);
+      droneFilter = audioCtx.createBiquadFilter();
+      droneFilter.type = 'lowpass';
+      droneFilter.frequency.setValueAtTime(150, audioCtx.currentTime);
 
-      synthOsc1.connect(filter);
-      synthOsc2.connect(filter);
-      filter.connect(mainDroneGain);
+      droneOsc1.connect(droneFilter);
+      droneOsc2.connect(droneFilter);
+      droneFilter.connect(masterGain);
 
-      synthOsc1.start();
-      synthOsc2.start();
+      droneOsc1.start();
+      droneOsc2.start();
+
+      // Cosmic Noise (Solar Wind Hum)
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = noiseBuffer;
+      noiseNode.loop = true;
+
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(300, audioCtx.currentTime);
+      noiseFilter.Q.setValueAtTime(3.0, audioCtx.currentTime);
+
+      noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+
+      noiseNode.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(masterGain);
+      noiseNode.start();
+
+      // Periodic Telemetry Radio Beeps
+      startTelemetryBeeps();
     } catch (e) {
-      console.warn("Web Audio API unavailable:", e);
+      console.warn("Web Audio API not supported:", e);
     }
   }
 
-  function playTransitionSound() {
+  function playTelemetryPulse(freq = 1800, duration = 0.08) {
     if (!audioCtx || isMuted) return;
     try {
       const now = audioCtx.currentTime;
@@ -187,268 +153,404 @@ document.addEventListener('DOMContentLoaded', () => {
       const gain = audioCtx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 0.3);
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + duration);
 
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(masterGain);
 
       osc.start(now);
-      osc.stop(now + 0.8);
+      osc.stop(now + duration);
     } catch (e) {}
   }
 
+  function startTelemetryBeeps() {
+    if (telemetryInterval) clearInterval(telemetryInterval);
+    telemetryInterval = setInterval(() => {
+      if (!isMuted && isPlaying) {
+        playTelemetryPulse(1600 + Math.random() * 800, 0.06);
+        if (Math.random() > 0.5) {
+          setTimeout(() => playTelemetryPulse(2200, 0.04), 100);
+        }
+      }
+    }, 1800);
+  }
+
   function toggleAudio() {
-    if (!audioCtx) initAudio();
-    if (audioCtx.state === 'suspended') {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume();
     }
 
     isMuted = !isMuted;
-    if (mainDroneGain) {
-      mainDroneGain.gain.linearRampToValueAtTime(isMuted ? 0.001 : 0.15, audioCtx.currentTime + 0.5);
+    if (masterGain) {
+      masterGain.gain.linearRampToValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime + 0.3);
     }
 
-    soundIcon.textContent = isMuted ? "🔊 오디오 켜기" : "🔇 오디오 끄기";
+    soundIcon.textContent = isMuted ? "🔇 사운드 켜기" : "🔊 사운드 끄기";
     btnSound.classList.toggle('active', !isMuted);
   }
 
   btnSound.addEventListener('click', toggleAudio);
 
-  // Scene Switching
-  function switchScene(index) {
-    currentSceneIndex = index;
-    sceneStartTime = Date.now();
-    const scene = SCENES[currentSceneIndex];
+  // Initialize audio on first click anywhere
+  document.body.addEventListener('click', () => {
+    if (!audioCtx) initAudio();
+  }, { once: true });
 
-    // Update UI elements
-    sceneTag.textContent = scene.tag;
-    captionMain.textContent = scene.main;
-    captionSub.textContent = scene.sub;
+  // ==========================================
+  // Render Vector Objects (Earth, Voyager, Beams)
+  // ==========================================
 
-    // Update buttons
-    sceneBtns.forEach((btn, idx) => {
-      btn.classList.toggle('active', idx === currentSceneIndex);
-    });
+  // Draw Detailed Earth (Departure Planet)
+  function drawEarth(x, y, radius, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
 
-    // Update Golden Record Overlay
-    if (scene.showRecord) {
-      goldenRecordOverlay.classList.add('show');
-    } else {
-      goldenRecordOverlay.classList.remove('show');
-    }
+    // Atmosphere Outer Glow
+    const atmosGlow = ctx.createRadialGradient(0, 0, radius * 0.8, 0, 0, radius * 1.6);
+    atmosGlow.addColorStop(0, 'rgba(0, 180, 255, 0.6)');
+    atmosGlow.addColorStop(0.5, 'rgba(0, 100, 255, 0.2)');
+    atmosGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = atmosGlow;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 1.6, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Update Signal Overlay
-    if (scene.showSignal) {
-      signalPulseContainer.classList.add('show');
-    } else {
-      signalPulseContainer.classList.remove('show');
-    }
+    // Planet Body
+    const planetGrad = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, radius * 0.1, 0, 0, radius);
+    planetGrad.addColorStop(0, '#4ba3e3');
+    planetGrad.addColorStop(0.5, '#195697');
+    planetGrad.addColorStop(1, '#051833');
+    ctx.fillStyle = planetGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fill();
 
-    playTransitionSound();
+    // Continent Shading
+    ctx.fillStyle = 'rgba(46, 139, 87, 0.4)';
+    ctx.beginPath();
+    ctx.ellipse(-radius * 0.2, -radius * 0.1, radius * 0.4, radius * 0.2, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
   }
 
-  sceneBtns.forEach((btn, idx) => {
-    btn.addEventListener('click', () => {
-      switchScene(idx);
-    });
-  });
-
-  // Render Voyager 1 Vector Model
-  function drawVoyager1(x, y, scale, time) {
+  // Draw Voyager 1 Probe Vector Graphics
+  function drawVoyager1(x, y, scale, rotation, time) {
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(scale, scale);
-    ctx.rotate(Math.sin(time * 0.001) * 0.03); // Subtle pitch float
+    ctx.rotate(rotation);
 
-    // Magnetometer Boom (Long Rod extending to upper left)
-    ctx.strokeStyle = '#6882a8';
+    // Magnetometer Boom (Long Rod extending left)
+    ctx.strokeStyle = '#647e9e';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(-240, -120);
+    ctx.lineTo(-260, -130);
     ctx.stroke();
 
-    // Magnetometer sensors
+    // Magnetometer Tip Sensor
     ctx.fillStyle = '#ffc83b';
     ctx.beginPath();
-    ctx.arc(-240, -120, 6, 0, Math.PI * 2);
+    ctx.arc(-260, -130, 6, 0, Math.PI * 2);
     ctx.fill();
 
-    // Science Boom (Upper right)
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(120, -100);
-    ctx.stroke();
-
-    // Scan platform camera
-    ctx.fillStyle = '#445875';
-    ctx.fillRect(110, -115, 30, 20);
-
-    // RTG (Radioisotope Thermoelectric Generator - Lower left)
-    ctx.strokeStyle = '#880000';
+    // RTG Power Core (Lower Left Boom)
+    ctx.strokeStyle = '#8a2be2';
     ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(-90, 80);
+    ctx.lineTo(-100, 90);
     ctx.stroke();
 
-    // RTG Power core glow
-    const rtgGlow = ctx.createRadialGradient(-90, 80, 2, -90, 80, 15);
-    rtgGlow.addColorStop(0, '#ff3b5c');
+    // RTG Power Core Amber Glow
+    const rtgGlow = ctx.createRadialGradient(-100, 90, 2, -100, 90, 18);
+    rtgGlow.addColorStop(0, '#ff9900');
+    rtgGlow.addColorStop(0.6, 'rgba(255, 50, 0, 0.4)');
     rtgGlow.addColorStop(1, 'transparent');
     ctx.fillStyle = rtgGlow;
     ctx.beginPath();
-    ctx.arc(-90, 80, 15, 0, Math.PI * 2);
+    ctx.arc(-100, 90, 18, 0, Math.PI * 2);
     ctx.fill();
 
-    // High Gain Parabolic Dish Antenna (White Parabola)
-    ctx.shadowColor = 'rgba(0, 240, 255, 0.4)';
-    ctx.shadowBlur = 25;
-
-    ctx.fillStyle = '#eef5ff';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 85, 45, -Math.PI / 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Dish Rim & Feed Horn Subreflector
+    // Main Body Bus (Octagonal Box)
+    ctx.fillStyle = '#1e293b';
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.fillStyle = '#112233';
     ctx.beginPath();
-    ctx.ellipse(0, 0, 75, 35, -Math.PI / 6, 0, Math.PI * 2);
+    ctx.arc(0, 0, 35, 0, Math.PI * 2);
     ctx.fill();
-
-    // Feed Horn Tripod
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(25, -35);
     ctx.stroke();
 
-    ctx.fillStyle = '#ffc83b';
-    ctx.beginPath();
-    ctx.arc(25, -35, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Radio Wave Beams (Sending signal to Earth)
-    const waveRadius = (time * 0.05) % 150;
-    ctx.strokeStyle = `rgba(0, 240, 255, ${1 - waveRadius / 150})`;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(25, -35, waveRadius, -Math.PI * 0.8, -Math.PI * 0.2);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  // Render Earth (Pale Blue Dot) in background
-  function drawEarth(x, y, scale) {
+    // Golden Record Mounted on Bus Body
+    const recordRot = time * 0.002;
     ctx.save();
-    ctx.translate(x, y);
-
-    // Pale Blue Dot Glow
-    const earthGlow = ctx.createRadialGradient(0, 0, 1, 0, 0, 30 * scale);
-    earthGlow.addColorStop(0, 'rgba(0, 180, 255, 0.9)');
-    earthGlow.addColorStop(0.3, 'rgba(0, 120, 255, 0.4)');
-    earthGlow.addColorStop(1, 'transparent');
-
-    ctx.fillStyle = earthGlow;
+    ctx.translate(-20, 15);
+    ctx.rotate(recordRot);
+    
+    // Gold disc
+    const goldGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 16);
+    goldGrad.addColorStop(0, '#ffe17d');
+    goldGrad.addColorStop(0.7, '#b8860b');
+    goldGrad.addColorStop(1, '#4a3300');
+    ctx.fillStyle = goldGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 30 * scale, 0, Math.PI * 2);
+    ctx.arc(0, 0, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffc83b';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Disc Center
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // High Gain Parabolic Dish Antenna (White Parabola facing Earth direction)
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.6)';
+    ctx.shadowBlur = 30;
+
+    // Antenna Outer White Shell
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.ellipse(15, -10, 95, 50, -Math.PI / 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Core Dot
-    ctx.fillStyle = '#ffffff';
+    // Antenna Dish Inner Blue Shading
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(0, 0, 3 * scale, 0, Math.PI * 2);
+    ctx.ellipse(15, -10, 85, 40, -Math.PI / 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Antenna Feed Horn Tripod
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(15, -10);
+    ctx.lineTo(45, -45);
+    ctx.stroke();
+
+    // Feed Horn Subreflector Light Pulse
+    ctx.fillStyle = '#00f0ff';
+    ctx.beginPath();
+    ctx.arc(45, -45, 6, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
   }
 
-  // Main Canvas Render Loop
-  function render(timestamp) {
-    const elapsed = Date.now() - sceneStartTime;
-    const currentScene = SCENES[currentSceneIndex];
+  // Render 1 Light-Day Signal Beam Traveling from Earth to Voyager
+  function drawLightDaySignalBeam(earthX, earthY, voyagerX, voyagerY, progress) {
+    ctx.save();
 
-    // Check if scene duration finished -> auto move to next scene if playing
-    if (isPlaying && elapsed > currentScene.duration) {
-      const nextIndex = (currentSceneIndex + 1) % SCENES.length;
-      switchScene(nextIndex);
+    // 1 Light-Day Distance Boundary Ring expanding from Earth
+    const maxRadius = Math.hypot(voyagerX - earthX, voyagerY - earthY);
+    const currentRadius = maxRadius * Math.min(1, progress);
+
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath();
+    ctx.arc(earthX, earthY, currentRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Signal Pulse Beam Line
+    const grad = ctx.createLinearGradient(earthX, earthY, voyagerX, voyagerY);
+    grad.addColorStop(0, 'rgba(0, 240, 255, 0.8)');
+    grad.addColorStop(Math.min(1, progress), 'rgba(255, 200, 59, 1)');
+    grad.addColorStop(Math.min(1, progress + 0.05), 'rgba(0, 240, 255, 0.1)');
+    grad.addColorStop(1, 'transparent');
+
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 15;
+
+    ctx.beginPath();
+    ctx.moveTo(earthX, earthY);
+    const targetX = earthX + (voyagerX - earthX) * Math.min(1, progress);
+    const targetY = earthY + (voyagerY - earthY) * Math.min(1, progress);
+    ctx.lineTo(targetX, targetY);
+    ctx.stroke();
+
+    // Pulsing Light Head (Speed of Light Wavefront)
+    if (progress <= 1) {
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#ffc83b';
+      ctx.shadowBlur = 25;
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 8, 0, Math.PI * 2);
+      ctx.fill();
     }
 
+    ctx.restore();
+  }
+
+  // ==========================================
+  // Main Animation Loop
+  // ==========================================
+  function render(timestamp) {
+    if (!isPlaying) {
+      animationFrameId = requestAnimationFrame(render);
+      return;
+    }
+
+    const elapsed = (Date.now() - startTime) % TOTAL_DURATION;
+    const progress = elapsed / TOTAL_DURATION;
+
     // Clear Canvas
-    ctx.fillStyle = '#030611';
+    ctx.fillStyle = '#02040a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    const w = canvas.width;
+    const h = canvas.height;
+    const centerX = w / 2;
+    const centerY = h / 2;
 
-    // Draw Nebulae
+    // Draw Deep Space Nebulae
     NEBULAE.forEach(neb => {
       const grad = ctx.createRadialGradient(
-        centerX + neb.x, centerY + neb.y, 10,
+        centerX + neb.x, centerY + neb.y, 20,
         centerX + neb.x, centerY + neb.y, neb.radius
       );
       grad.addColorStop(0, neb.color);
       grad.addColorStop(1, 'transparent');
-
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(centerX + neb.x, centerY + neb.y, neb.radius, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Draw Stars with Twinkle
+    // Draw Starfield (Parallax & Twinkle)
     stars.forEach(star => {
-      star.alpha += Math.sin(timestamp * star.twinkleSpeed) * 0.01;
-      const clampedAlpha = Math.max(0.1, Math.min(1, star.alpha));
-
-      ctx.fillStyle = `rgba(255, 255, 255, ${clampedAlpha})`;
+      const alpha = Math.max(0.1, Math.min(1, star.alpha + Math.sin(timestamp * star.twinkleSpeed) * 0.2));
+      ctx.fillStyle = star.color;
+      ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(centerX + star.x, centerY + star.y, star.size, 0, Math.PI * 2);
       ctx.fill();
     });
+    ctx.globalAlpha = 1.0;
 
-    // Update Distance Ticker Value
-    const liveDist = currentScene.distanceBase + Math.floor(timestamp * 15);
-    distanceVal.textContent = liveDist.toLocaleString('en-US');
+    // Draw Solar Wind Stream Lines
+    particles.forEach(p => {
+      p.x -= p.speed;
+      if (p.x < -w / 2) p.x = w / 2 + 200;
 
-    // Scene Specific Animations
-    const sceneProgress = Math.min(1, elapsed / currentScene.duration);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(centerX + p.x, centerY + p.y);
+      ctx.lineTo(centerX + p.x + p.length, centerY + p.y - p.length * 0.2);
+      ctx.stroke();
+    });
 
-    // Draw Pale Blue Dot (Earth)
-    const earthX = 150;
-    const earthY = canvas.height - 150;
-    drawEarth(earthX, earthY, 1.2);
+    // ----------------------------------------------------
+    // Motion Journey Phases (0s - 30s)
+    // ----------------------------------------------------
+    let earthX, earthY, earthRadius, earthAlpha;
+    let voyagerX, voyagerY, voyagerScale, voyagerRot;
+    let signalProgress = 0;
 
-    // Draw Voyager 1 Probe
-    const voyagerX = centerX + (Math.sin(timestamp * 0.0005) * 50) + (currentScene.id * 20);
-    const voyagerY = centerY + (Math.cos(timestamp * 0.0005) * 30);
-    const voyagerScale = currentScene.camZoom;
+    if (progress < 0.25) {
+      // Phase 1 (0s - 7.5s): Earth Departure & Solar System Zoom Out
+      const phaseT = progress / 0.25;
 
-    drawVoyager1(voyagerX, voyagerY, voyagerScale, timestamp);
+      earthX = w * 0.25 - phaseT * (w * 0.15);
+      earthY = h * 0.4;
+      earthRadius = 80 * (1 - phaseT * 0.7);
+      earthAlpha = 1.0 - phaseT * 0.4;
+
+      voyagerX = w * 0.5 + phaseT * (w * 0.25);
+      voyagerY = h * 0.5 - phaseT * (h * 0.15);
+      voyagerScale = 0.6 + phaseT * 0.3;
+      voyagerRot = Math.sin(timestamp * 0.001) * 0.05;
+
+    } else if (progress < 0.65) {
+      // Phase 2 (7.5s - 19.5s): 1 Light-Day Signal Journey (Earth to Voyager)
+      const phaseT = (progress - 0.25) / 0.40;
+
+      earthX = w * 0.1;
+      earthY = h * 0.75;
+      earthRadius = 16;
+      earthAlpha = 0.6;
+
+      voyagerX = w * 0.82;
+      voyagerY = h * 0.28;
+      voyagerScale = 0.95;
+      voyagerRot = 0.05 + Math.sin(timestamp * 0.0008) * 0.03;
+
+      signalProgress = phaseT;
+
+    } else {
+      // Phase 3 (19.5s - 30s): Interstellar Heliosphere Boundary & Deep Drift
+      const phaseT = (progress - 0.65) / 0.35;
+
+      earthX = w * 0.08;
+      earthY = h * 0.8;
+      earthRadius = 8;
+      earthAlpha = 0.3 * (1 - phaseT);
+
+      voyagerX = w * 0.82 - phaseT * (w * 0.15);
+      voyagerY = h * 0.28 + phaseT * (h * 0.1);
+      voyagerScale = 0.95 - phaseT * 0.35;
+      voyagerRot = 0.08 + phaseT * 0.1;
+
+      signalProgress = 1.0;
+
+      // Draw Glowing Heliosphere Boundary Wave
+      ctx.save();
+      const helioGrad = ctx.createLinearGradient(w * 0.4, 0, w * 0.6, h);
+      helioGrad.addColorStop(0, 'rgba(147, 51, 234, 0.0)');
+      helioGrad.addColorStop(0.5, `rgba(168, 85, 247, ${0.4 * Math.sin(phaseT * Math.PI)})`);
+      helioGrad.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+      ctx.strokeStyle = helioGrad;
+      ctx.lineWidth = 20;
+      ctx.shadowColor = '#a855f7';
+      ctx.shadowBlur = 40;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, -100);
+      ctx.bezierCurveTo(w * 0.45, h * 0.3, w * 0.55, h * 0.7, w * 0.5, h + 100);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Render Earth
+    drawEarth(earthX, earthY, earthRadius, earthAlpha);
+
+    // Render 1 Light-Day Signal Beam Propagation
+    if (signalProgress > 0) {
+      drawLightDaySignalBeam(earthX, earthY, voyagerX, voyagerY, signalProgress);
+    }
+
+    // Render Voyager 1 Probe
+    drawVoyager1(voyagerX, voyagerY, voyagerScale, voyagerRot, timestamp);
 
     animationFrameId = requestAnimationFrame(render);
   }
 
   animationFrameId = requestAnimationFrame(render);
 
-  // Play / Pause Controls
+  // Controls
   btnPlayPause.addEventListener('click', () => {
     isPlaying = !isPlaying;
     playIcon.textContent = isPlaying ? "⏸ 일시정지" : "▶ 재생";
     btnPlayPause.classList.toggle('active', isPlaying);
   });
 
-  // Fullscreen
   btnFullscreen.addEventListener('click', () => {
     const elem = document.getElementById('videoContainer');
     if (!document.fullscreenElement) {
@@ -458,9 +560,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Video Export Engine (MediaRecorder)
+  // Video Export Engine (MediaRecorder for pure video & audio)
   btnExportVideo.addEventListener('click', async () => {
-    if (!audioCtx) initAudio();
+    initAudio();
     if (audioCtx && audioCtx.state === 'suspended') {
       await audioCtx.resume();
     }
@@ -470,22 +572,18 @@ document.addEventListener('DOMContentLoaded', () => {
     renderStatusText.textContent = '0%';
 
     try {
-      // Create Canvas Stream (30 FPS)
       const canvasStream = canvas.captureStream(30);
-
-      // Create Web Audio Destination Stream if sound enabled
       let combinedStream = canvasStream;
-      if (audioCtx && mainDroneGain) {
+
+      if (audioCtx && masterGain) {
         const dest = audioCtx.createMediaStreamDestination();
-        mainDroneGain.connect(dest);
-        
+        masterGain.connect(dest);
         const audioTrack = dest.stream.getAudioTracks()[0];
         if (audioTrack) {
           combinedStream.addTrack(audioTrack);
         }
       }
 
-      // Check supported MIME types
       let options = { mimeType: 'video/webm;codecs=vp9,opus' };
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         options = { mimeType: 'video/webm' };
@@ -504,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'voyager1_teaser_1lightday.webm';
+        a.download = 'voyager1_1lightday_motion_journey.webm';
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {
@@ -514,29 +612,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
       };
 
-      // Start Recording all 6 scenes (approx 24 seconds total)
-      switchScene(0);
+      // Restart cycle from 0 for clean recording
+      startTime = Date.now();
       isPlaying = true;
       mediaRecorder.start();
 
-      const totalDuration = SCENES.reduce((acc, s) => acc + s.duration, 0);
-      const startTime = Date.now();
-
-      const progressInterval = setInterval(() => {
-        const pElapsed = Date.now() - startTime;
-        const percent = Math.min(100, Math.floor((pElapsed / totalDuration) * 100));
+      const recInterval = setInterval(() => {
+        const recElapsed = Date.now() - startTime;
+        const percent = Math.min(100, Math.floor((recElapsed / TOTAL_DURATION) * 100));
         
         renderProgress.style.width = `${percent}%`;
         renderStatusText.textContent = `${percent}%`;
 
-        if (pElapsed >= totalDuration) {
-          clearInterval(progressInterval);
+        if (recElapsed >= TOTAL_DURATION) {
+          clearInterval(recInterval);
           mediaRecorder.stop();
         }
       }, 200);
 
     } catch (err) {
-      alert("비디오 녹화 실패: " + err.message);
+      alert("비디오 녹화 중 오류: " + err.message);
       renderModal.classList.remove('show');
     }
   });
