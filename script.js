@@ -1,12 +1,25 @@
 /* =================================================================
-   Abstract Audiovisual Artwork: "Light-Day Gap" (1광일의 시간차)
-   - Zero Text, Zero Buttons, 100% Canvas Visual & Generative Audio
-   - Visualizing Human Time vs Cosmic Light Time Dilation
+   "Light-Day Gap" - 1-Minute Generative Audiovisual Artwork Engine
+   - 60-Second Structured Playtime Cycle
+   - Bottom Control Toolbar & Random Variation Generator
+   - Generative Web Audio Synthesizer
+   - MediaRecorder 1-Minute Video Export (.webm)
    ================================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('artCanvas');
   const ctx = canvas.getContext('2d');
+
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const playIcon = document.getElementById('playIcon');
+  const btnSound = document.getElementById('btnSound');
+  const soundIcon = document.getElementById('soundIcon');
+  const btnRandomize = document.getElementById('btnRandomize');
+  const btnExportVideo = document.getElementById('btnExportVideo');
+
+  const renderModal = document.getElementById('renderModal');
+  const renderProgress = document.getElementById('renderProgress');
+  const renderStatusText = document.getElementById('renderStatusText');
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -15,15 +28,70 @@ document.addEventListener('DOMContentLoaded', () => {
   resize();
   window.addEventListener('resize', resize);
 
-  // Timeline (Cycle: 12 seconds per pulse propagation)
-  let isPlaying = true;
+  // 1-Minute Playtime Cycle Configuration (60,000 ms)
+  const CYCLE_DURATION = 60000;
   let startTime = Date.now();
+  let isPlaying = true;
+  let isMuted = false;
+  let animationFrameId = null;
 
-  // Generative Web Audio Engine
+  // =========================================================
+  // Generative Randomization State (Randomized on each run)
+  // =========================================================
+  const PALETTES = [
+    { name: 'Aurora Cyan', primary: '#00f0ff', secondary: '#ffc83b', accent: '#7c3aed', bgGrad: '#01040f' },
+    { name: 'Solar Magenta', primary: '#e056fd', secondary: '#ff9f43', accent: '#00d2d3', bgGrad: '#0a010f' },
+    { name: 'Emerald Nebula', primary: '#10b981', secondary: '#3b82f6', accent: '#f59e0b', bgGrad: '#010f0a' },
+    { name: 'Supernova Violet', primary: '#ec4899', secondary: '#8b5cf6', accent: '#06b6d4', bgGrad: '#0f010a' }
+  ];
+
+  let currentSeed = {
+    palette: PALETTES[0],
+    bpm: 72,
+    baseFreq: 55, // A1
+    waveCount: 6,
+    starCount: 400,
+    monadShape: 4, // 4 = Diamond/Square, 3 = Triangle, 6 = Hexagon
+    waveSpeed: 1.0
+  };
+
+  let stars = [];
+  function generateStars() {
+    stars = [];
+    for (let i = 0; i < currentSeed.starCount; i++) {
+      stars.push({
+        x: Math.random(),
+        y: Math.random(),
+        size: Math.random() * 2 + 0.4,
+        speed: Math.random() * 0.0003 + 0.00005,
+        alpha: Math.random() * 0.7 + 0.2
+      });
+    }
+  }
+
+  function randomizeArt() {
+    const paletteIndex = Math.floor(Math.random() * PALETTES.length);
+    currentSeed.palette = PALETTES[paletteIndex];
+    currentSeed.bpm = 60 + Math.floor(Math.random() * 24); // 60 - 84 BPM
+    currentSeed.baseFreq = [43.65, 55.0, 65.41, 73.42][Math.floor(Math.random() * 4)]; // F1, A1, C2, D2
+    currentSeed.waveCount = 4 + Math.floor(Math.random() * 5);
+    currentSeed.monadShape = [3, 4, 6][Math.floor(Math.random() * 3)];
+    currentSeed.waveSpeed = 0.8 + Math.random() * 0.4;
+
+    generateStars();
+    resetAudioPulseTimer();
+    startTime = Date.now();
+  }
+
+  // =========================================================
+  // Generative Web Audio API Engine
+  // =========================================================
   let audioCtx = null;
   let masterGain = null;
-  let droneOsc = null;
-  let heartbeatTimer = null;
+  let droneOsc1 = null;
+  let droneOsc2 = null;
+  let droneFilter = null;
+  let pulseTimer = null;
 
   function initAudio() {
     if (audioCtx) return;
@@ -32,145 +100,146 @@ document.addEventListener('DOMContentLoaded', () => {
       audioCtx = new AudioContext();
 
       masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      masterGain.gain.setValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime);
       masterGain.connect(audioCtx.destination);
 
-      // Deep Cosmic Background Drone (Sine & Harmonic Overtone)
-      droneOsc = audioCtx.createOscillator();
-      droneOsc.type = 'sine';
-      droneOsc.frequency.setValueAtTime(55, audioCtx.currentTime); // 55Hz (A1)
+      // Deep Space Base Drone
+      droneOsc1 = audioCtx.createOscillator();
+      droneOsc1.type = 'sawtooth';
+      droneOsc1.frequency.setValueAtTime(currentSeed.baseFreq, audioCtx.currentTime);
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+      droneOsc2 = audioCtx.createOscillator();
+      droneOsc2.type = 'sine';
+      droneOsc2.frequency.setValueAtTime(currentSeed.baseFreq * 2, audioCtx.currentTime);
 
-      droneOsc.connect(filter);
-      filter.connect(masterGain);
-      droneOsc.start();
+      droneFilter = audioCtx.createBiquadFilter();
+      droneFilter.type = 'lowpass';
+      droneFilter.frequency.setValueAtTime(160, audioCtx.currentTime);
 
-      // Human Heartbeat / Clock Tick Rhythmic Generator (72 BPM)
-      heartbeatTimer = setInterval(() => {
-        if (audioCtx && isPlaying) {
-          playHumanPulseSound();
-        }
-      }, 833); // ~72 BPM
+      droneOsc1.connect(droneFilter);
+      droneOsc2.connect(droneFilter);
+      droneFilter.connect(masterGain);
 
+      droneOsc1.start();
+      droneOsc2.start();
+
+      resetAudioPulseTimer();
     } catch (e) {
-      console.warn("Audio unavailable", e);
+      console.warn("Audio Context init error:", e);
     }
   }
 
-  // Sound of Human Heartbeat / Ticking Time on Earth
-  function playHumanPulseSound() {
+  function resetAudioPulseTimer() {
+    if (pulseTimer) clearInterval(pulseTimer);
+    const intervalMs = Math.floor((60 / currentSeed.bpm) * 1000);
+    pulseTimer = setInterval(() => {
+      if (audioCtx && isPlaying && !isMuted) {
+        playHumanBiologicalPulse();
+      }
+    }, intervalMs);
+  }
+
+  function playHumanBiologicalPulse() {
     if (!audioCtx) return;
     try {
       const now = audioCtx.currentTime;
-      
-      // Warm Sub Heartbeat
+
+      // Heartbeat Sub-Kick Sound
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(80, now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.16);
 
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
       osc.connect(gain);
       gain.connect(masterGain);
-      osc.start(now);
-      osc.stop(now + 0.15);
 
-      // Gentle Clock Tick Shimmer
+      osc.start(now);
+      osc.stop(now + 0.16);
+
+      // Clock Tick Harmonic Sparkle
       const tick = audioCtx.createOscillator();
       const tickGain = audioCtx.createGain();
       tick.type = 'triangle';
-      tick.frequency.setValueAtTime(1200, now);
-      tick.frequency.exponentialRampToValueAtTime(400, now + 0.03);
+      tick.frequency.setValueAtTime(1400, now);
+      tick.frequency.exponentialRampToValueAtTime(500, now + 0.03);
 
-      tickGain.gain.setValueAtTime(0.03, now);
+      tickGain.gain.setValueAtTime(0.04, now);
       tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
 
       tick.connect(tickGain);
       tickGain.connect(masterGain);
+
       tick.start(now);
       tick.stop(now + 0.03);
     } catch (e) {}
   }
 
-  // Sound when Light Wave reaches the 1 Light-Day Distant Monad
-  function playLightEchoSound() {
-    if (!audioCtx) return;
+  function play1LightDayEchoSound() {
+    if (!audioCtx || isMuted) return;
     try {
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
+      const freq = currentSeed.baseFreq * 8; // High crystalline overtone
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now); // A4
-      osc.frequency.exponentialRampToValueAtTime(880, now + 1.2); // A5
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 1.5);
 
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
 
       osc.connect(gain);
       gain.connect(masterGain);
+
       osc.start(now);
-      osc.stop(now + 1.5);
+      osc.stop(now + 1.8);
     } catch (e) {}
   }
 
-  // Click to start audio or toggle
-  document.body.addEventListener('click', () => {
-    if (!audioCtx) {
-      initAudio();
-    } else if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    } else {
-      isPlaying = !isPlaying;
+  // =========================================================
+  // Canvas Rendering Engine (60-Second Playtime Cycle)
+  // =========================================================
+  generateStars();
+
+  let lastEchoTriggered = false;
+
+  function render(timestamp) {
+    if (!isPlaying) {
+      animationFrameId = requestAnimationFrame(render);
+      return;
     }
-  });
-
-  // Abstract Particles
-  const STAR_COUNT = 300;
-  const stars = [];
-  for (let i = 0; i < STAR_COUNT; i++) {
-    stars.push({
-      x: Math.random(),
-      y: Math.random(),
-      size: Math.random() * 1.8 + 0.4,
-      speed: Math.random() * 0.0002 + 0.00005,
-      alpha: Math.random() * 0.7 + 0.2
-    });
-  }
-
-  let lastEchoPlayed = false;
-
-  // Main Rendering Loop
-  function draw(timestamp) {
-    requestAnimationFrame(draw);
 
     const w = canvas.width;
     const h = canvas.height;
-    const elapsed = Date.now() - startTime;
-    const cycleT = (elapsed % 12000) / 12000; // 12-second cycle
+    const elapsed = (Date.now() - startTime) % CYCLE_DURATION;
+    const cycleT = elapsed / CYCLE_DURATION; // 0.0 to 1.0 across 60 seconds
 
-    // Dark Cosmic Void Background with slight motion trail
-    ctx.fillStyle = 'rgba(1, 2, 6, 0.25)';
+    // Dark Cosmic Background Gradient
+    ctx.fillStyle = currentSeed.palette.bgGrad;
+    ctx.globalAlpha = 0.25;
     ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1.0;
 
-    // Render Ambient Cosmic Dust / Stars
+    // Render Generative Starfield
     stars.forEach(s => {
       s.x -= s.speed;
       if (s.x < 0) s.x = 1;
 
-      ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha * (0.5 + 0.5 * Math.sin(timestamp * 0.002 + s.x * 10))})`;
+      const starAlpha = Math.max(0.1, s.alpha + Math.sin(timestamp * 0.002 + s.x * 20) * 0.2);
+      ctx.fillStyle = currentSeed.palette.primary;
+      ctx.globalAlpha = starAlpha * 0.7;
       ctx.beginPath();
       ctx.arc(s.x * w, s.y * h, s.size, 0, Math.PI * 2);
       ctx.fill();
     });
+    ctx.globalAlpha = 1.0;
 
-    // Positions for Abstract Nodes
+    // Abstract Nodes
     const humanX = w * 0.18;      // Left: Earth / Human Time Node
     const humanY = h * 0.5;
 
@@ -178,72 +247,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const distantY = h * 0.5;
 
     // ---------------------------------------------------
-    // 1. Human Time Node (Warm Pulsating Biological Core)
+    // 1. Human Time Node (Warm Biological Core)
     // ---------------------------------------------------
-    const humanPulse = Math.sin(timestamp * 0.007) * 0.15 + 1.0;
+    const pulseFactor = Math.sin(timestamp * 0.008) * 0.15 + 1.0;
     
-    // Outer Warm Aura
-    const humanGlow = ctx.createRadialGradient(humanX, humanY, 5, humanX, humanY, 140 * humanPulse);
-    humanGlow.addColorStop(0, 'rgba(255, 140, 50, 0.8)');
-    humanGlow.addColorStop(0.4, 'rgba(255, 80, 20, 0.25)');
+    const humanGlow = ctx.createRadialGradient(humanX, humanY, 5, humanX, humanY, 150 * pulseFactor);
+    humanGlow.addColorStop(0, currentSeed.palette.secondary);
+    humanGlow.addColorStop(0.5, 'rgba(255, 100, 0, 0.2)');
     humanGlow.addColorStop(1, 'transparent');
     ctx.fillStyle = humanGlow;
     ctx.beginPath();
-    ctx.arc(humanX, humanY, 140 * humanPulse, 0, Math.PI * 2);
+    ctx.arc(humanX, humanY, 150 * pulseFactor, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rotating Fractal Clock Rings (Human Time Ticking)
+    // Rotating Fractal Clock Rings
     ctx.save();
     ctx.translate(humanX, humanY);
     ctx.rotate(timestamp * 0.001);
-    ctx.strokeStyle = 'rgba(255, 200, 100, 0.35)';
+    ctx.strokeStyle = currentSeed.palette.secondary;
     ctx.lineWidth = 1.5;
-    for (let r = 25; r <= 65; r += 12) {
+    for (let r = 30; r <= 70; r += 14) {
       ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 1.4);
+      ctx.arc(0, 0, r, 0, Math.PI * 1.5);
       ctx.stroke();
-      ctx.rotate(-timestamp * 0.0005);
+      ctx.rotate(-timestamp * 0.0006);
     }
     ctx.restore();
 
-    // Biological Inner Core
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(humanX, humanY, 10 * humanPulse, 0, Math.PI * 2);
+    ctx.arc(humanX, humanY, 12 * pulseFactor, 0, Math.PI * 2);
     ctx.fill();
 
     // ---------------------------------------------------
-    // 2. The Light Propagation & Time Dilation Waves
+    // 2. Light Wave Dilation across 1 Light-Day (60s Progress)
     // ---------------------------------------------------
-    const currentLightX = humanX + (distantX - humanX) * cycleT;
     const distTotal = distantX - humanX;
+    const currentLightX = humanX + distTotal * cycleT;
 
-    // Concentric Wave Fronts Traveling across 1 Light-Day
-    for (let i = 0; i < 5; i++) {
-      const waveT = (cycleT - i * 0.15 + 1) % 1;
+    // Concentric Wave Fronts (Diatonic Dilation)
+    for (let i = 0; i < currentSeed.waveCount; i++) {
+      const waveT = (cycleT - i * (0.8 / currentSeed.waveCount) + 1) % 1;
       const waveX = humanX + distTotal * waveT;
-      const waveRadius = 30 + waveT * 120; // Waves stretch & dilate as they travel
+      const waveRadius = 35 + waveT * 150;
       const waveAlpha = (1 - waveT) * 0.6;
 
-      ctx.strokeStyle = `rgba(0, 240, 255, ${waveAlpha})`;
-      ctx.lineWidth = 2 * (1 + waveT * 2);
+      ctx.strokeStyle = currentSeed.palette.primary;
+      ctx.globalAlpha = waveAlpha;
+      ctx.lineWidth = 2 + waveT * 3;
       ctx.beginPath();
-      ctx.arc(waveX, humanY, waveRadius, -Math.PI * 0.6, Math.PI * 0.6);
+      ctx.arc(waveX, humanY, waveRadius, -Math.PI * 0.55, Math.PI * 0.55);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1.0;
 
-    // Speed-of-Light Energy Wavefront Spark
-    const lightSparkGlow = ctx.createRadialGradient(currentLightX, humanY, 2, currentLightX, humanY, 35);
-    lightSparkGlow.addColorStop(0, '#ffffff');
-    lightSparkGlow.addColorStop(0.3, '#00f0ff');
-    lightSparkGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = lightSparkGlow;
+    // Speed of Light Front Spark
+    const sparkGlow = ctx.createRadialGradient(currentLightX, humanY, 2, currentLightX, humanY, 40);
+    sparkGlow.addColorStop(0, '#ffffff');
+    sparkGlow.addColorStop(0.4, currentSeed.palette.primary);
+    sparkGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = sparkGlow;
     ctx.beginPath();
-    ctx.arc(currentLightX, humanY, 35, 0, Math.PI * 2);
+    ctx.arc(currentLightX, humanY, 40, 0, Math.PI * 2);
     ctx.fill();
 
-    // Connecting Time Line (Gravitational Field String)
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.12)';
+    // Connecting Gravitational Line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(humanX, humanY);
@@ -251,53 +320,166 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.stroke();
 
     // ---------------------------------------------------
-    // 3. The 1 Light-Day Distant Monad (Cold Frozen Echo)
+    // 3. 1 Light-Day Monad Node & Echo Effect (At 50s-60s)
     // ---------------------------------------------------
-    const isWaveArriving = cycleT > 0.92;
-    if (isWaveArriving && !lastEchoPlayed) {
-      playLightEchoSound();
-      lastEchoPlayed = true;
+    const isWaveArriving = cycleT > 0.85;
+    if (isWaveArriving && !lastEchoTriggered) {
+      play1LightDayEchoSound();
+      lastEchoTriggered = true;
     } else if (!isWaveArriving) {
-      lastEchoPlayed = false;
+      lastEchoTriggered = false;
     }
 
-    const distantPulse = isWaveArriving ? 1.6 : (1.0 + Math.sin(timestamp * 0.002) * 0.08);
+    const monadScale = isWaveArriving ? 1.8 : (1.0 + Math.sin(timestamp * 0.002) * 0.1);
 
-    // Distant Monad Cold Cyan Aura
-    const monadGlow = ctx.createRadialGradient(distantX, distantY, 4, distantX, distantY, 100 * distantPulse);
-    monadGlow.addColorStop(0, isWaveArriving ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 240, 255, 0.7)');
-    monadGlow.addColorStop(0.5, 'rgba(120, 0, 255, 0.25)');
+    const monadGlow = ctx.createRadialGradient(distantX, distantY, 4, distantX, distantY, 110 * monadScale);
+    monadGlow.addColorStop(0, isWaveArriving ? '#ffffff' : currentSeed.palette.accent);
+    monadGlow.addColorStop(0.6, 'rgba(120, 0, 255, 0.25)');
     monadGlow.addColorStop(1, 'transparent');
     ctx.fillStyle = monadGlow;
     ctx.beginPath();
-    ctx.arc(distantX, distantY, 100 * distantPulse, 0, Math.PI * 2);
+    ctx.arc(distantX, distantY, 110 * monadScale, 0, Math.PI * 2);
     ctx.fill();
 
-    // Crystalline Geometry
+    // Polygon Shape Monad (Triangle, Square, or Hexagon)
     ctx.save();
     ctx.translate(distantX, distantY);
-    ctx.rotate(-timestamp * 0.0006);
-    ctx.strokeStyle = isWaveArriving ? '#ffffff' : 'rgba(0, 240, 255, 0.6)';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(-18 * distantPulse, -18 * distantPulse, 36 * distantPulse, 36 * distantPulse);
+    ctx.rotate(timestamp * 0.0005);
+    ctx.strokeStyle = currentSeed.palette.primary;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const sides = currentSeed.monadShape;
+    const r = 24 * monadScale;
+    for (let s = 0; s < sides; s++) {
+      const angle = (s * 2 * Math.PI) / sides;
+      const px = Math.cos(angle) * r;
+      const py = Math.sin(angle) * r;
+      if (s === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
     ctx.restore();
 
-    // Distant Monad Core
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(distantX, distantY, 5 * distantPulse, 0, Math.PI * 2);
+    ctx.arc(distantX, distantY, 6 * monadScale, 0, Math.PI * 2);
     ctx.fill();
 
-    // Delayed Echo Ripples Returning to Earth
+    // 1 Light-Day Echo Wave Propagation back
     if (isWaveArriving) {
-      const echoT = (cycleT - 0.92) / 0.08;
-      ctx.strokeStyle = `rgba(180, 100, 255, ${0.8 * (1 - echoT)})`;
+      const echoProgress = (cycleT - 0.85) / 0.15;
+      ctx.strokeStyle = currentSeed.palette.accent;
       ctx.lineWidth = 3;
+      ctx.globalAlpha = 1.0 - echoProgress;
       ctx.beginPath();
-      ctx.arc(distantX, distantY, echoT * 200, 0, Math.PI * 2);
+      ctx.arc(distantX, distantY, echoProgress * 280, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.globalAlpha = 1.0;
     }
+
+    animationFrameId = requestAnimationFrame(render);
   }
 
-  requestAnimationFrame(draw);
+  animationFrameId = requestAnimationFrame(render);
+
+  // Controls Event Listeners
+  btnPlayPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    playIcon.textContent = isPlaying ? "⏸ 일시정지" : "▶ 재생";
+    btnPlayPause.classList.toggle('active', isPlaying);
+  });
+
+  btnSound.addEventListener('click', () => {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    isMuted = !isMuted;
+    if (masterGain) {
+      masterGain.gain.linearRampToValueAtTime(isMuted ? 0.001 : 0.25, audioCtx.currentTime + 0.3);
+    }
+    soundIcon.textContent = isMuted ? "🔇 사운드 켜기" : "🔊 사운드 끄기";
+    btnSound.classList.toggle('active', !isMuted);
+  });
+
+  btnRandomize.addEventListener('click', () => {
+    randomizeArt();
+  });
+
+  // 1-Minute Video Recorder (.webm)
+  btnExportVideo.addEventListener('click', async () => {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+
+    renderModal.classList.add('show');
+    renderProgress.style.width = '0%';
+    renderStatusText.textContent = '0%';
+
+    try {
+      const canvasStream = canvas.captureStream(30);
+      let combinedStream = canvasStream;
+
+      if (audioCtx && masterGain) {
+        const dest = audioCtx.createMediaStreamDestination();
+        masterGain.connect(dest);
+        const audioTrack = dest.stream.getAudioTracks()[0];
+        if (audioTrack) {
+          combinedStream.addTrack(audioTrack);
+        }
+      }
+
+      let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm' };
+      }
+
+      const mediaRecorder = new MediaRecorder(combinedStream, options);
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `light_day_gap_1min_${Date.now()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          renderModal.classList.remove('show');
+        }, 100);
+      };
+
+      // Restart 1-minute cycle from 0
+      startTime = Date.now();
+      isPlaying = true;
+      mediaRecorder.start();
+
+      const recInterval = setInterval(() => {
+        const recElapsed = Date.now() - startTime;
+        const percent = Math.min(100, Math.floor((recElapsed / CYCLE_DURATION) * 100));
+
+        renderProgress.style.width = `${percent}%`;
+        renderStatusText.textContent = `${percent}%`;
+
+        if (recElapsed >= CYCLE_DURATION) {
+          clearInterval(recInterval);
+          mediaRecorder.stop();
+        }
+      }, 250);
+
+    } catch (err) {
+      alert("영상 녹화 중 오류: " + err.message);
+      renderModal.classList.remove('show');
+    }
+  });
 });
