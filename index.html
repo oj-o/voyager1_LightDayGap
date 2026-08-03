@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>보이저 1호, 49년 만의 '1광일' 도달 - 티저 영상</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Canvas Container -->
+  <div class="video-container" id="videoContainer">
+    <canvas id="spaceCanvas"></canvas>
+
+    <!-- Overlay UI Elements inside Video Frame -->
+    <div class="video-overlay" id="videoOverlay">
+      
+      <!-- Top Header Info -->
+      <div class="top-bar">
+        <div class="badge-source">
+          <span class="live-indicator">● LIVE ASTRO-DATA</span>
+          <span class="article-tag">한겨레 곽노필의 미래창</span>
+        </div>
+        <div class="distance-ticker" id="distanceTicker">
+          <span class="label">지구와의 거리:</span>
+          <span class="value" id="distanceVal">25,902,068,356</span>
+          <span class="unit">km (1.00 Light-Day)</span>
+        </div>
+      </div>
+
+      <!-- Main Dynamic Subtitle / Title Container -->
+      <div class="caption-box" id="captionBox">
+        <div class="scene-tag" id="sceneTag">SCENE 01 / LAUNCH</div>
+        <h1 class="caption-main" id="captionMain">1977년 9월 5일</h1>
+        <p class="caption-sub" id="captionSub">지구를 떠난 인류 최전방 척후병 보이저 1호</p>
+      </div>
+
+      <!-- Golden Record Visualizer Overlay (Scene 5) -->
+      <div class="golden-record-wrapper" id="goldenRecordOverlay">
+        <div class="record-disc" id="recordDisc">
+          <div class="record-grooves"></div>
+          <div class="record-center">
+            <div class="sun-symbol"></div>
+          </div>
+        </div>
+        <div class="record-glow"></div>
+      </div>
+
+      <!-- Signal Transmission Pulse (Scene 3) -->
+      <div class="signal-pulse-container" id="signalPulseContainer">
+        <div class="earth-node">지구 (Earth)</div>
+        <div class="signal-line">
+          <div class="pulse-beam" id="pulseBeam"></div>
+          <div class="time-delay-badge">48시간 시차 (Light Speed Signal)</div>
+        </div>
+        <div class="voyager-node">보이저 1호</div>
+      </div>
+
+      <!-- Bottom Control Toolbar -->
+      <div class="bottom-toolbar">
+        <div class="scene-nav">
+          <button class="scene-btn active" data-scene="0">1. 발사</button>
+          <button class="scene-btn" data-scene="1">2. 1광일 도달</button>
+          <button class="scene-btn" data-scene="2">3. 48시간 통신</button>
+          <button class="scene-btn" data-scene="3">4. 전력 고갈</button>
+          <button class="scene-btn" data-scene="4">5. 골든 레코드</button>
+          <button class="scene-btn" data-scene="5">6. 에필로그</button>
+        </div>
+
+        <div class="action-controls">
+          <button id="btnPlayPause" class="ctrl-btn main-play">
+            <span id="playIcon">▶ 재생</span>
+          </button>
+          <button id="btnSound" class="ctrl-btn">
+            <span id="soundIcon">🔊 오디오 켜기</span>
+          </button>
+          <button id="btnExportVideo" class="ctrl-btn record-btn">
+            <span id="recordIcon">🎬 영상 다운로드 (.webm)</span>
+          </button>
+          <button id="btnFullscreen" class="ctrl-btn">
+            <span>⛶ 전체화면</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Render Progress Overlay during Video Recording -->
+      <div class="render-modal" id="renderModal">
+        <div class="render-card">
+          <div class="spinner"></div>
+          <h3>티저 영상 인코딩 중...</h3>
+          <p>MediaRecorder로 캔버스 및 사운드를 실시간 녹화하고 있습니다.</p>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="renderProgress"></div>
+          </div>
+          <span id="renderStatusText">0%</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Article Info Section -->
+  <main class="info-section">
+    <div class="container">
+      <div class="article-meta-card">
+        <h2>보이저 1호, 49년 만에 ‘1광일’ 거리…2030년대 타임캡슐로 남는다</h2>
+        <div class="meta-row">
+          <span><strong>원문 기사:</strong> 한겨레 곽노필의 미래창 (2026.07.24)</span>
+          <span><a href="https://www.hani.co.kr/arti/science/science_general/1269765.html" target="_blank" rel="noopener">기사 원문 읽기 ↗</a></span>
+        </div>
+        <div class="key-facts-grid">
+          <div class="fact-item">
+            <div class="fact-num">259억 km</div>
+            <div class="fact-desc">2026년 11월 18일, 지구에서 1광일(빛이 하루 동안 가는 거리) 도달</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-num">48 시간</div>
+            <div class="fact-desc">지구에서 "안녕" 명령 전송 후 응답 받기까지 걸리는 왕복 시간</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-num">2 / 10</div>
+            <div class="fact-desc">전력 감소로 탑재된 10개 과학장비 중 자력계·플라스마 관측기 2개만 가동 중</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-num">Golden Record</div>
+            <div class="fact-desc">2030년대 통신이 끊긴 후에도 인류의 음악과 메시지를 품고 영원히 항해</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
