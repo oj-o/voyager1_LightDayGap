@@ -11,10 +11,27 @@
 </head>
 <body>
 
-  <!-- Square fisheye dome master. No controls: this plays itself, once, for 300s. -->
+  <!-- Square fisheye dome master. Plays itself, once, for 300s — no audience interaction needed.
+       The panel below is a producer/preview tool only: hidden until the mouse moves,
+       so it stays invisible during an actual dome show where no one touches a mouse. -->
   <canvas id="artCanvas"></canvas>
 
-  <!-- Appears only if the hidden export shortcut (E) is used to produce the dome file -->
+  <div class="dome-panel" id="domePanel">
+    <div class="panel-card">
+      <div class="chapters">
+        <button class="chapter-btn" data-t="0">EARTH</button>
+        <button class="chapter-btn" data-t="40">JUPITER</button>
+        <button class="chapter-btn" data-t="80">SATURN</button>
+        <button class="chapter-btn" data-t="130">COMETS</button>
+        <button class="chapter-btn" data-t="180">HELIOPAUSE</button>
+        <button class="chapter-btn" data-t="220">NOW</button>
+        <button class="chapter-btn" data-t="270">FUTURE</button>
+      </div>
+      <button id="btnRecord" class="record-btn">● RECORD (5M)</button>
+    </div>
+  </div>
+
+  <!-- Appears only while a recording (via the RECORD button) is in progress -->
   <div class="render-modal" id="renderModal">
     <div class="render-card">
       <div class="spinner"></div>

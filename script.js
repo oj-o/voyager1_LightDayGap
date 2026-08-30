@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderModal = document.getElementById('renderModal');
   const renderProgress = document.getElementById('renderProgress');
   const renderStatusText = document.getElementById('renderStatusText');
+  const domePanel = document.getElementById('domePanel');
+  const btnRecord = document.getElementById('btnRecord');
+  const chapterBtns = Array.from(document.querySelectorAll('.chapter-btn'));
 
   /* Square fisheye master frame, centered — the dome only ever sees a circle. */
   let w = 1, h = 1;
@@ -553,20 +556,58 @@ document.addEventListener('DOMContentLoaded', () => {
   requestAnimationFrame(render);
 
   /* ---------------------------------------------------------------
-     No visible controls. A hidden keyboard shortcut (E) lets whoever
-     is producing the dome master export the full 300s run once.
+     Producer/preview panel — invisible to a dome audience (nobody
+     touches a mouse during an actual show), revealed only on pointer
+     movement. Lets someone jump to a chapter to check it looks right,
+     and record the full 300s master from a visible RECORD button.
   --------------------------------------------------------------- */
+  let panelHideTimer = null;
+  function showPanel() {
+    domePanel.classList.add('visible');
+    clearTimeout(panelHideTimer);
+    panelHideTimer = setTimeout(() => domePanel.classList.remove('visible'), 3000);
+  }
+  window.addEventListener('pointermove', showPanel);
+  window.addEventListener('touchstart', showPanel, { passive: true });
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'e' || e.key === 'E') startExport();
-    if (e.key === 'm' || e.key === 'M') {
-      isMuted = !isMuted;
-      if (master && audioCtx) master.gain.linearRampToValueAtTime(isMuted ? 0.0001 : 0.28, audioCtx.currentTime + 0.3);
-    }
+    if (e.key === 'm' || e.key === 'M') toggleMute();
   });
+
+  function toggleMute() {
+    isMuted = !isMuted;
+    if (master && audioCtx) master.gain.linearRampToValueAtTime(isMuted ? 0.0001 : 0.28, audioCtx.currentTime + 0.3);
+  }
+
+  /* Jumping to a chapter re-derives every continuous system (stars,
+     planets, sun, dome rotation are all pure functions of elapsed
+     time) and marks past one-shot events as already-fired so a jump
+     doesn't dump their stale captions/blips all at once — the scene
+     still looks fully populated for whichever moment was picked. */
+  function jumpTo(tSec) {
+    elapsed = tSec * 1000;
+    render.prevReal = performance.now();
+    caption = null;
+    activeDistortion = null;
+    comets.length = 0;
+    voyagerFlashUntil = 0;
+    domeBurstUntil = 0;
+    for (const ev of EVENTS) ev.fired = ev.time <= elapsed;
+  }
+
+  chapterBtns.forEach(btn => {
+    btn.addEventListener('click', () => jumpTo(parseFloat(btn.dataset.t)));
+  });
+
+  btnRecord.addEventListener('click', () => startExport());
 
   async function startExport() {
     if (isExporting) return;
     isExporting = true;
+    btnRecord.disabled = true;
+    btnRecord.textContent = 'RECORDING…';
+    chapterBtns.forEach(b => b.disabled = true);
     initAudio();
     if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
 
@@ -593,7 +634,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.style.display = 'none'; a.href = url; a.download = `light_day_gap_dome_5min_${Date.now()}.webm`;
         document.body.appendChild(a); a.click();
-        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); renderModal.classList.remove('show'); isExporting = false; }, 100);
+        setTimeout(() => {
+          document.body.removeChild(a); URL.revokeObjectURL(url); renderModal.classList.remove('show');
+          isExporting = false; btnRecord.disabled = false; btnRecord.textContent = '● RECORD (5M)';
+          chapterBtns.forEach(b => b.disabled = false);
+        }, 100);
       };
 
       elapsed = 0; render.prevReal = performance.now();
@@ -610,6 +655,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       renderModal.classList.remove('show');
       isExporting = false;
+      btnRecord.disabled = false; btnRecord.textContent = '● RECORD (5M)';
+      chapterBtns.forEach(b => b.disabled = false);
     }
   }
 });

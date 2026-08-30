@@ -33,7 +33,84 @@ html, body {
   display: block;
 }
 
-/* Minimal Render Modal — only appears if the hidden export shortcut (E) is used */
+/* Producer/preview panel — hidden until the mouse moves, auto-hides again.
+   Invisible during an actual dome show (no mouse in use there). */
+.dome-panel {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease, transform .5s ease;
+}
+
+.dome-panel.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.panel-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(6, 12, 26, 0.75);
+  backdrop-filter: blur(16px);
+  padding: 8px 14px;
+  border-radius: 30px;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.12);
+}
+
+.chapters {
+  display: flex;
+  gap: 4px;
+}
+
+.chapter-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.chapter-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+.chapter-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+.record-btn {
+  background: linear-gradient(135deg, #ff3860, #d91b42);
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 18px;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.record-btn:hover { box-shadow: 0 0 20px rgba(255, 56, 96, 0.7); }
+.record-btn:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+
+/* Minimal Render Modal — only appears while a recording is in progress */
 .render-modal {
   position: fixed;
   top: 0;
