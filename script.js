@@ -15,8 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderModal = document.getElementById('renderModal');
   const renderProgress = document.getElementById('renderProgress');
   const renderStatusText = document.getElementById('renderStatusText');
+  const renderTimeText = document.getElementById('renderTimeText');
   const domePanel = document.getElementById('domePanel');
   const btnRecord = document.getElementById('btnRecord');
+  const recordDurationSelect = document.getElementById('recordDuration');
   const chapterBtns = Array.from(document.querySelectorAll('.chapter-btn'));
 
   /* Square fisheye master frame, centered — the dome only ever sees a circle. */
@@ -33,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
      Global clock. No modulo, no scene index, nothing resets itself.
   --------------------------------------------------------------- */
   const DURATION = 300000;
+  const FADE_MS = 12000;
+  const SINGLE_PLAY_MS = DURATION + FADE_MS;
   let elapsed = 0;
   let isMuted = false;
   let lastFrameTime = performance.now();
@@ -526,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const hue = paletteHue(tSec);
-    const endFade = elapsed > DURATION ? clamp01((elapsed - DURATION) / 12000) : 0;
+    const endFade = elapsed > DURATION ? clamp01((elapsed - DURATION) / FADE_MS) : 0;
 
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, w, h);
@@ -602,11 +606,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnRecord.addEventListener('click', () => startExport());
 
+  // '5' maps to the full single play-through (narrative + its 12s fade-out),
+  // not a hard 300000ms cut, so the default export ends resolved rather than
+  // abruptly mid-fade.
+  const RECORD_DURATIONS = { '1': 60000, '5': SINGLE_PLAY_MS, '10': 600000, '40': 2400000 };
+
+  function formatClock(ms) {
+    const totalSec = Math.max(0, Math.floor(ms / 1000));
+    const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+    const s = String(totalSec % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function pickSupportedMimeType() {
+    const candidates = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      'video/mp4'
+    ];
+    for (const mt of candidates) {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(mt)) return mt;
+    }
+    return '';
+  }
+
   async function startExport() {
     if (isExporting) return;
+
+    if (typeof MediaRecorder === 'undefined' || !canvas.captureStream) {
+      alert('This browser does not support video recording. Please try a recent Chrome/Edge browser.');
+      return;
+    }
+
+    const minutes = recordDurationSelect.value;
+    const RECORD_TOTAL = RECORD_DURATIONS[minutes] || DURATION;
+
     isExporting = true;
     btnRecord.disabled = true;
     btnRecord.textContent = 'RECORDING…';
+    recordDurationSelect.disabled = true;
     chapterBtns.forEach(b => b.disabled = true);
     initAudio();
     if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
@@ -614,49 +655,111 @@ document.addEventListener('DOMContentLoaded', () => {
     renderModal.classList.add('show');
     renderProgress.style.width = '0%';
     renderStatusText.textContent = '0%';
+    renderTimeText.textContent = `00:00 / ${formatClock(RECORD_TOTAL)}`;
+
+    let poll = null;
+
+    function cleanupUI() {
+      isExporting = false;
+      btnRecord.disabled = false;
+      btnRecord.textContent = '● RECORD';
+      recordDurationSelect.disabled = false;
+      chapterBtns.forEach(b => b.disabled = false);
+      if (poll) { clearInterval(poll); poll = null; }
+    }
 
     try {
-      const canvasStream = canvas.captureStream(30);
+      const videoTrack = canvas.captureStream(30).getVideoTracks()[0];
+      const tracks = [videoTrack];
       if (audioCtx && master) {
         const dest = audioCtx.createMediaStreamDestination();
         master.connect(dest);
         const track = dest.stream.getAudioTracks()[0];
-        if (track) canvasStream.addTrack(track);
+        if (track) tracks.push(track);
       }
-      let options = { mimeType: 'video/webm;codecs=vp9,opus' };
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) options = { mimeType: 'video/webm' };
-      const recorder = new MediaRecorder(canvasStream, options);
+      const combinedStream = new MediaStream(tracks);
+
+      const mimeType = pickSupportedMimeType();
+      const fileExt = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const recorder = mimeType
+        ? new MediaRecorder(combinedStream, { mimeType })
+        : new MediaRecorder(combinedStream);
       const chunks = [];
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none'; a.href = url; a.download = `light_day_gap_dome_5min_${Date.now()}.webm`;
-        document.body.appendChild(a); a.click();
-        setTimeout(() => {
-          document.body.removeChild(a); URL.revokeObjectURL(url); renderModal.classList.remove('show');
-          isExporting = false; btnRecord.disabled = false; btnRecord.textContent = '● RECORD (5M)';
-          chapterBtns.forEach(b => b.disabled = false);
-        }, 100);
+
+      recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onerror = (e) => {
+        cleanupUI();
+        renderModal.classList.remove('show');
+        alert('Recording error: ' + (e.error ? e.error.message : 'unknown error'));
       };
 
+      recorder.onstop = () => {
+        cleanupUI();
+
+        if (chunks.length === 0) {
+          renderModal.classList.remove('show');
+          alert('No video data was captured. Please try again.');
+          return;
+        }
+
+        renderStatusText.textContent = 'Saving...';
+
+        const blob = new Blob(chunks, { type: mimeType || 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `light_day_gap_dome_${minutes}min_${Date.now()}.${fileExt}`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Long recordings can produce large files; revoking the object URL
+        // right after click() can cut the download off before the browser
+        // finishes writing it, so keep it alive well past that.
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 30000);
+
+        renderModal.classList.remove('show');
+      };
+
+      // Reset the narrative to the start for a clean master take. If the
+      // requested length is longer than one play-through (DURATION + fade),
+      // the poll below seamlessly restarts it so the export becomes a
+      // continuous multi-loop file rather than mostly a black/silent tail —
+      // the on-screen single-play behavior for a live dome show is unaffected.
       elapsed = 0; render.prevReal = performance.now();
       EVENTS.forEach(ev => ev.fired = false);
       comets.length = 0;
-      recorder.start();
+      recorder.start(1000);
 
-      const poll = setInterval(() => {
-        const pct = Math.min(100, Math.floor((elapsed / DURATION) * 100));
+      const recordStartWall = Date.now();
+      poll = setInterval(() => {
+        const recElapsed = Date.now() - recordStartWall;
+        const pct = Math.min(100, Math.floor((recElapsed / RECORD_TOTAL) * 100));
         renderProgress.style.width = `${pct}%`;
         renderStatusText.textContent = `${pct}%`;
-        if (elapsed >= DURATION + 500) { clearInterval(poll); recorder.stop(); }
+        renderTimeText.textContent = `${formatClock(Math.min(recElapsed, RECORD_TOTAL))} / ${formatClock(RECORD_TOTAL)}`;
+
+        if (elapsed >= SINGLE_PLAY_MS && recElapsed < RECORD_TOTAL - 500) {
+          elapsed = 0; render.prevReal = performance.now();
+          EVENTS.forEach(ev => ev.fired = false);
+          comets.length = 0;
+          if (master && audioCtx) master.gain.setTargetAtTime(isMuted ? 0.0001 : 0.28, audioCtx.currentTime, 0.3);
+        }
+
+        if (recElapsed >= RECORD_TOTAL) {
+          clearInterval(poll); poll = null;
+          renderStatusText.textContent = 'Encoding...';
+          if (recorder.state !== 'inactive') recorder.stop();
+        }
       }, 250);
     } catch (err) {
+      cleanupUI();
       renderModal.classList.remove('show');
-      isExporting = false;
-      btnRecord.disabled = false; btnRecord.textContent = '● RECORD (5M)';
-      chapterBtns.forEach(b => b.disabled = false);
+      alert('Recording error: ' + err.message);
     }
   }
 });

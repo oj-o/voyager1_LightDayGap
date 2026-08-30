@@ -27,7 +27,13 @@
         <button class="chapter-btn" data-t="220">NOW</button>
         <button class="chapter-btn" data-t="270">FUTURE</button>
       </div>
-      <button id="btnRecord" class="record-btn">● RECORD (5M)</button>
+      <select id="recordDuration" class="chapter-btn duration-select" title="Recording length">
+        <option value="1">1M</option>
+        <option value="5" selected>5M</option>
+        <option value="10">10M</option>
+        <option value="40">40M</option>
+      </select>
+      <button id="btnRecord" class="record-btn">● RECORD</button>
     </div>
   </div>
 
@@ -39,6 +45,7 @@
         <div class="progress-bar-fill" id="renderProgress"></div>
       </div>
       <span id="renderStatusText" class="status-num">0%</span>
+      <div id="renderTimeText" class="time-num">00:00 / 00:00</div>
     </div>
   </div>
 
