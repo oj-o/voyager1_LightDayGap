@@ -11,10 +11,10 @@
 </head>
 <body>
 
-  <!-- Full-Screen Artwork Canvas -->
+  <!-- Full-Screen Artwork Canvas: the piece itself, nothing else runs by default -->
   <canvas id="artCanvas"></canvas>
 
-  <!-- Absolute Bottom Floating Controls (English Only) -->
+  <!-- Hidden until the pointer moves; auto-hides again after a few seconds -->
   <div class="bottom-toolbar">
     <div class="toolbar-card">
       <button id="btnPlayPause" class="ctrl-btn main-play">
@@ -23,11 +23,9 @@
       <button id="btnSound" class="ctrl-btn">
         <span id="soundIcon">SOUND ON</span>
       </button>
-      <button id="btnRandomize" class="ctrl-btn rand-btn">
-        <span>RANDOM</span>
-      </button>
+      <span id="timeLabel" class="time-label">00:00 / 05:00</span>
       <button id="btnExportVideo" class="ctrl-btn record-btn">
-        <span id="recordIcon">EXPORT (1m)</span>
+        <span id="recordIcon">EXPORT (5M)</span>
       </button>
     </div>
   </div>

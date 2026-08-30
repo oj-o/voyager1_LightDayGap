@@ -1,23 +1,55 @@
-# 🌌 Light-Day Gap - 1-Minute Generative Audiovisual Art
+# 🌌 Light-Day Gap — 300-Second Non-Looping Generative Audiovisual Art
 
-![Artwork Status](https://img.shields.io/badge/ARTWORK-1--MIN--GENERATIVE-00f0ff?style=for-the-badge)
+![Artwork Status](https://img.shields.io/badge/ARTWORK-5--MIN--GENERATIVE-00f0ff?style=for-the-badge)
 ![License](https://img.shields.io/badge/LICENSE-MIT-yellow?style=for-the-badge)
 
 An abstract audiovisual artwork inspired by the Hankyoreh article [**"Voyager 1 reaches 1 Light-Day distance after 49 years"**](https://www.hani.co.kr/arti/science/science_general/1269765.html).
 
----
-
-## 🎨 Features
-
-- **Pure Canvas Art & Auto-play**: Canvas animation auto-plays smoothly across the screen on load with zero explanation text overlays.
-- **Absolute Bottom English Controls**: Floating glass toolbar positioned at the absolute bottom edge featuring English control buttons:
-  - `PAUSE` / `PLAY`
-  - `SOUND ON` / `SOUND OFF`
-  - `RANDOM` (Generates a new procedural color palette, sound frequency, and wave geometry)
-  - `EXPORT (1m)` (Records 1 full minute of high-quality canvas video + audio to `.webm`)
-- **1-Minute Playtime Cycle (60s)**: 60-second structured timeline showing the temporal disconnect between Human Time on Earth and Light Propagation across 25.9 billion km.
+**핵심 문장: "내가 지금 보고 있는 것도 이미 늦게 도착한 것이다."**
+보이는 것은 이미 과거다 — 빛이 도착하는 순간과 실제 사건이 일어난 순간의 시간차를 화면의 잔상·중첩·지연·시선·복제된 천체로 번역한다.
 
 ---
 
-## 🔗 GitHub Repository
+## v2에서 바뀐 것
+
+기존 60초 반복 루프 구조를, **정확히 300초 동안 단 한 번만 진행되는 단일 서사**로 재작성했다.
+
+- `time % 60` 같은 모듈로 반복, 고정 scene index, 동일 keyframe 배열/노이즈 시드/카메라 경로/사운드 시퀀스 반복을 전부 제거했다.
+- 대신 `elapsed`(경과 시간, ms) 하나만을 유일한 진실로 삼아, 모든 시각·음향 파라미터를 `progress = elapsed / 300000`에 대한 곡선(curve) + 계속 드리프트하는 노이즈로 계산한다.
+- 별/입자 생성·소멸·분열, 천체의 형태(점→원→고리→궤도→빛번짐→노이즈→선) 순환, Voyager 1의 가시성과 위치, 카메라 시점(줌/회전/이동/흔들림), 화면 왜곡(파동/색수차/찢김/픽셀화/거울대칭), 5개 사운드 레이어의 화성이 모두 서로 다른 주기로 동시에 계속 변한다.
+- 20여 개의 "한 번만 발생하는" 주요 이벤트(별 폭발, 신호 발사, Voyager 첫 목격, 시간층 분리, 1광일 자막 등)를 실행마다 ±25% 지터를 준 시각에 소비형으로 배치했다. 한 번 발생한 이벤트는 다시 발생하지 않는다.
+- RANDOM(완전 재시작) 버튼은 제거했다 — 이 버전의 원칙은 "처음부터 다시"가 아니라 "현재 시간축 위에서 계속 변이"이기 때문이다.
+- 컨트롤 툴바는 기본적으로 숨겨져 있고, 포인터를 움직였을 때만 잠깐 나타난다: `PAUSE/PLAY`, `SOUND ON/OFF`, `TIME 00:00 / 05:00`, `EXPORT (5M)`.
+- 화면에 상시 노출되는 설명 문구는 없다. 등장 가능한 텍스트는 `EARTH`, `NOW`, `SIGNAL`, `DELAY`, `VOYAGER 1`, `23:46:00`, `1 LIGHT-DAY` 뿐이며, 각각 0.3~2초만 나타났다가 사라진다.
+
+## 실제 Voyager 1 정보 (2026년 기준, 이 작품이 참조한 수치)
+
+- 지구 기준 약 **23시간 46분**의 편도 빛/전파 지연 상태.
+- **2026년 11월 18일경** 지구로부터 1광일(light-day) 거리에 도달할 예정.
+- **2026년 4월** 전력 절약을 위해 LECP(저에너지 하전입자) 장비가 종료됨.
+
+작품은 이 수치를 긴 설명으로 풀어내지 않고, 짧은 자막과 시간층 시각화로만 암시한다.
+
+## 아키텍처 요약
+
+- **글로벌 클록**: `const DURATION = 300000; let elapsed = 0;` — `isPlaying`일 때만 실제 경과 시간만큼 누적되고, 절대 초기화(모듈로)되지 않는다.
+- **커브 + 진화형 노이즈**: `starDensity/cameraDistance/noiseAmount/delayAmount/lightIntensity/voyagerVisibility/harmonicTension/particleSpeed` 등 8개 파라미터를 0~300초 앵커 포인트 사이의 곡선으로 정의하고, 그 위에 여러 개의 사인파를 합성한 결정론적 노이즈(`noise1`)를 얹어 매 순간이 예측 불가능하게 만든다.
+- **입자/별 시스템**: 최대 900개, 각자 독립된 수명·밝기·깜빡임 속도·깊이를 가지며 수명이 다하면 재생성되거나(대부분) 드물게 분열한다.
+- **천체 형태 순환**: 점→원→고리→궤도→빛번짐→노이즈→선 상태를 3~10초 간격으로 계속 갈아탄다.
+- **Voyager 1**: 노이즈 기반 경로로 움직이며, 평소엔 거의 보이지 않다가 예정된 이벤트에서 잠깐 실루엣(본체+안테나)으로 밝아진다.
+- **빛의 시간층**: 하나의 광원 위치를 매 프레임 기록해두고, 0/0.5/1.5/3/6/10초 전 상태를 각각 점/고리/구름/끊긴 선/스페클로 동시에 그린다 — "보이는 것은 이미 과거"를 직접 구현한 부분.
+- **시선/포인터 지연 반응**: 포인터 위치 이력을 기록해두고, 항상 과거의 위치(0.15~3초 전, 그 값 자체도 계속 변함)에 반응한다. 오래 머무르면 주변이 모이고 화음이 올라가며, 빠르게 움직이면 화면 왜곡이 튈 수 있다.
+- **카메라 시스템**: closeup/zoomout/driftSide/pullCenter/fullRotate/shake/flip 중 하나를 2~15초마다 선택해 부드럽게 전환한다.
+- **화면 왜곡**: wave(파동)/chroma(색수차 근사)/tear(가로 찢김)/pixel(픽셀화)/mirror(거울 대칭) 5가지를 0.5~3초짜리 사건으로 사용한다. *(단, 명령서의 kaleidoscope(다중 대칭 분할)는 좌우 거울 대칭으로 단순화했고, radial distortion은 카메라 줌 펄스로 대체 구현했다 — 다각형 웨지 기반 완전한 만화경 효과는 이번 패스에 넣지 않았다.)*
+- **사운드**: EARTH(느린 드론)·VOYAGER(더 느린 서브 드론)·LIGHT(고역 셔머 클릭)·SIGNAL(이벤트성 펄스)·DELAY(이전 소리를 몇 초 뒤에 낮은 음량·낮은 필터로 재생) 5개 레이어. 공통 `evolvingScale()`이 루트 주파수와 음정 간격을 노이즈로 계속 드리프트시켜 고정된 코드 진행이 없다.
+- **300초 종료**: 진행이 끝나면 파라미터가 그 상태로 멈추고 화면과 소리가 약 12초에 걸쳐 서서히 어두워진다(재시작하지 않음).
+- **EXPORT (5M)**: `MediaRecorder`로 캔버스+오디오를 하나의 `.webm`으로 저장한다. 클릭 시 시계를 0으로 되돌리고 이벤트 소비 플래그를 리셋해 정확히 한 번의 300초 재생을 그대로 녹화한다 — 녹화용으로 별도의 짧은 루프를 쓰지 않는다.
+
+## 알려진 단순화 (다음 단계에서 개선 가능)
+
+- 웹캠 기반 눈동자 추적은 옵션으로 언급되었지만 이번 패스에는 넣지 않았다. 현재는 마우스/터치 포인터가 "시선" 입력을 전담하며, 권한 요청 없이 항상 완전히 동작한다.
+- 만화경(kaleidoscopic split)은 좌우 거울 대칭으로, radial distortion은 카메라 줌 펄스로 단순화했다.
+- 이벤트는 예시로 제시된 20개 지점을 기반으로 하며(±25% 지터 포함), 정확한 발생 시각·순서는 실행마다 달라진다.
+
+## GitHub Repository
 [https://github.com/oj-o/voyager1-teaser](https://github.com/oj-o/voyager1-teaser)

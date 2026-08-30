@@ -32,14 +32,31 @@ html, body {
   display: block;
 }
 
-/* Floating Toolbar at Absolute Bottom Edge */
+/* Floating Toolbar at Absolute Bottom Edge — hidden until the pointer moves */
 .bottom-toolbar {
   position: fixed;
   bottom: 12px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(10px);
   z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease, transform .5s ease;
+}
+
+.bottom-toolbar.visible {
+  opacity: 1;
   pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.time-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: rgba(226, 232, 240, 0.7);
+  padding: 0 4px;
+  white-space: nowrap;
 }
 
 .toolbar-card {
@@ -84,16 +101,6 @@ html, body {
 
 .ctrl-btn.main-play:hover {
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
-}
-
-.ctrl-btn.rand-btn {
-  background: linear-gradient(135deg, rgba(224, 86, 253, 0.35), rgba(120, 0, 255, 0.45));
-  border-color: var(--accent-magenta);
-  color: #fff;
-}
-
-.ctrl-btn.rand-btn:hover {
-  box-shadow: 0 0 20px rgba(224, 86, 253, 0.6);
 }
 
 .ctrl-btn.record-btn {
