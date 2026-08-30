@@ -11,26 +11,10 @@
 </head>
 <body>
 
-  <!-- Full-Screen Artwork Canvas: the piece itself, nothing else runs by default -->
+  <!-- Square fisheye dome master. No controls: this plays itself, once, for 300s. -->
   <canvas id="artCanvas"></canvas>
 
-  <!-- Hidden until the pointer moves; auto-hides again after a few seconds -->
-  <div class="bottom-toolbar">
-    <div class="toolbar-card">
-      <button id="btnPlayPause" class="ctrl-btn main-play">
-        <span id="playIcon">PAUSE</span>
-      </button>
-      <button id="btnSound" class="ctrl-btn">
-        <span id="soundIcon">SOUND ON</span>
-      </button>
-      <span id="timeLabel" class="time-label">00:00 / 05:00</span>
-      <button id="btnExportVideo" class="ctrl-btn record-btn">
-        <span id="recordIcon">EXPORT (5M)</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Minimal Progress Modal -->
+  <!-- Appears only if the hidden export shortcut (E) is used to produce the dome file -->
   <div class="render-modal" id="renderModal">
     <div class="render-card">
       <div class="spinner"></div>

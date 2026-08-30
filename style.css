@@ -1,14 +1,12 @@
 /* ==========================================
-   "Light-Day Gap" - Pure Artwork & Bottom English Controls
+   "Light-Day Gap" — square fisheye dome master, no on-screen controls
    ========================================== */
 
 :root {
-  --bg-dark: #010206;
+  --bg-dark: #000000;
   --accent-cyan: #00f0ff;
   --accent-gold: #ffc83b;
   --accent-magenta: #e056fd;
-  --glass-bg: rgba(6, 12, 26, 0.7);
-  --glass-border: rgba(0, 240, 255, 0.25);
   --font-display: 'Orbitron', sans-serif;
 }
 
@@ -24,96 +22,18 @@ html, body {
   overflow: hidden;
   background-color: var(--bg-dark);
   font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* The canvas is always square (the fisheye master frame) and centered;
+   whatever space is left over on a non-square window stays pure black. */
 #artCanvas {
-  width: 100vw;
-  height: 100vh;
   display: block;
 }
 
-/* Floating Toolbar at Absolute Bottom Edge — hidden until the pointer moves */
-.bottom-toolbar {
-  position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  z-index: 50;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .5s ease, transform .5s ease;
-}
-
-.bottom-toolbar.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-}
-
-.time-label {
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  color: rgba(226, 232, 240, 0.7);
-  padding: 0 4px;
-  white-space: nowrap;
-}
-
-.toolbar-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  padding: 8px 18px;
-  border-radius: 40px;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.15);
-}
-
-.ctrl-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #e2e8f0;
-  padding: 8px 16px;
-  border-radius: 24px;
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.ctrl-btn:hover {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-  color: #fff;
-}
-
-.ctrl-btn.main-play {
-  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
-  color: #000;
-  border: none;
-}
-
-.ctrl-btn.main-play:hover {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
-}
-
-.ctrl-btn.record-btn {
-  background: linear-gradient(135deg, #ff3860, #d91b42);
-  color: #fff;
-  border: none;
-}
-
-.ctrl-btn.record-btn:hover {
-  box-shadow: 0 0 20px rgba(255, 56, 96, 0.7);
-}
-
-/* Minimal Render Modal Overlay */
+/* Minimal Render Modal — only appears if the hidden export shortcut (E) is used */
 .render-modal {
   position: fixed;
   top: 0;
