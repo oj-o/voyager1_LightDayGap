@@ -3,7 +3,7 @@
 ![Artwork Status](https://img.shields.io/badge/ARTWORK-5--MIN--FULLDOME-00f0ff?style=for-the-badge)
 ![License](https://img.shields.io/badge/LICENSE-MIT-yellow?style=for-the-badge)
 
-An abstract audiovisual film for planetarium dome projection, inspired by the Hankyoreh article ["Voyager 1 reaches 1 Light-Day distance after 49 years"](https://www.hani.co.kr/arti/science/science_general/1269765.html).
+An abstract audiovisual film for planetarium dome projection, inspired by the ["Voyager 1 reaches 1 Light-Day distance after 49 years"]
 
  "내가 지금 보고 있는 것도 이미 늦게 도착한 것"
 
