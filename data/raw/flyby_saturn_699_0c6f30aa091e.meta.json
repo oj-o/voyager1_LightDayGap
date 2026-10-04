@@ -1,0 +1,31 @@
+{
+  "fetched_at_utc": "2026-09-28T08:18:31.406575+00:00",
+  "target": "699",
+  "label": "flyby_saturn",
+  "parameters": {
+    "format": "json",
+    "COMMAND": "'699'",
+    "OBJ_DATA": "'YES'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'VECTORS'",
+    "CENTER": "'500@0'",
+    "REF_SYSTEM": "'ICRF'",
+    "REF_PLANE": "'FRAME'",
+    "OUT_UNITS": "'KM-S'",
+    "VEC_CORR": "'NONE'",
+    "VEC_TABLE": "'2'",
+    "CSV_FORMAT": "'YES'",
+    "TIME_TYPE": "'TDB'",
+    "TIME_DIGITS": "'FRACSEC'",
+    "START_TIME": "'1980-11-05'",
+    "STOP_TIME": "'1980-11-20'",
+    "STEP_SIZE": "'6 h'"
+  },
+  "source_url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27699%27&OBJ_DATA=%27YES%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&OUT_UNITS=%27KM-S%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TIME_DIGITS=%27FRACSEC%27&START_TIME=%271980-11-05%27&STOP_TIME=%271980-11-20%27&STEP_SIZE=%276+h%27",
+  "raw_sha256": "6e0a7497216b1c1b662a879d9e6bd99884856f0cdce4b89322bd4f35ee663c3f",
+  "response_header": "*******************************************************************************\n Revised: January 26, 2022             Saturn                               699\n \n PHYSICAL DATA:\n  Mass x10^26 (kg)      = 5.6834          Density (g/cm^3)       =  0.687+-.001\n  Equat. radius (1 bar) = 60268+-4 km     Polar radius (km)      = 54364+-10\n  Vol. Mean Radius (km) = 58232+-6        Flattening             =  0.09796\n  Geometric Albedo      = 0.47            Rocky core mass (Mc/M) =  0.1027\n  Sid. rot. period (III)= 10h 39m 22.4s   Sid. rot. rate (rad/s) =  0.000163785 \n  Mean solar day, hrs   =~10.656         \n  GM (km^3/s^2)         = 37931206.234    GM 1-sigma (km^3/s^2)  = +- 98\n  Equ. grav, ge (m/s^2) = 10.44           Pol. grav, gp (m/s^2)  = 12.14+-0.01\n  Vis. magnitude V(1,0) = -8.88          \n  Vis. mag. (opposition)= +0.67           Obliquity to orbit     = 26.73 deg\n  Sidereal orbit period = 29.447498 yr    Sidereal orbit period  = 10755.698 d\n  Mean daily motion     = 0.0334979 deg/d Mean orbit velocity    =  9.68 km/s\n  Atmos. temp. (1 bar)  = 134+-4 K        Escape speed, km/s    =  35.5          \n  Aroche(ice)/Rp        =  2.71           Hill's sphere rad. Rp  = 1100\n                                 Perihelion  Aphelion    Mean\n  Solar Constant (W/m^2)         16.8        13.6        15.1\n  Maximum Planetary IR (W/m^2)    4.7         4.5         4.6\n  Minimum Planetary IR (W/m^2)    4.7         4.5         4.6\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Mon Sep 28 01:18:31 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Saturn (699)                    {source: sat441l}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 1980-Nov-05 00:00:00.0000 TDB\nStop  time      : A.D. 1980-Nov-20 00:00:00.0000 TDB\nStep-size       : 360 minutes\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************",
+  "rows": 61,
+  "jd_start": 2444548.5,
+  "jd_end": 2444563.5,
+  "note": "Ephemeris in SSB / ICRF / TDB with VEC_CORR=NONE"
+}

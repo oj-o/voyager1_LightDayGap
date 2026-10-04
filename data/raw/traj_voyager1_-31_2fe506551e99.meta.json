@@ -1,0 +1,31 @@
+{
+  "fetched_at_utc": "2026-09-28T08:18:26.949219+00:00",
+  "target": "-31",
+  "label": "traj_voyager1",
+  "parameters": {
+    "format": "json",
+    "COMMAND": "'-31'",
+    "OBJ_DATA": "'YES'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'VECTORS'",
+    "CENTER": "'500@0'",
+    "REF_SYSTEM": "'ICRF'",
+    "REF_PLANE": "'FRAME'",
+    "OUT_UNITS": "'KM-S'",
+    "VEC_CORR": "'NONE'",
+    "VEC_TABLE": "'2'",
+    "CSV_FORMAT": "'YES'",
+    "TIME_TYPE": "'TDB'",
+    "TIME_DIGITS": "'FRACSEC'",
+    "START_TIME": "'1977-09-06'",
+    "STOP_TIME": "'2026-12-01'",
+    "STEP_SIZE": "'10 d'"
+  },
+  "source_url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27-31%27&OBJ_DATA=%27YES%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&OUT_UNITS=%27KM-S%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TIME_DIGITS=%27FRACSEC%27&START_TIME=%271977-09-06%27&STOP_TIME=%272026-12-01%27&STEP_SIZE=%2710+d%27",
+  "raw_sha256": "14cd3558e01ffb799491a7c1ca06f9e6bf4101632da4338b290c247c7b8eb21f",
+  "response_header": "*******************************************************************************\n Revised: Aug 19, 2022   Voyager 1 Spacecraft (interplanetary) / (Sun)     -31\n                        http://www.jpl.nasa.gov/missions/voyager-1/\n\n BACKGROUND\n   See the web-page above for information on the Voyager Mission\n\n TIMELINE\n   1977-Sep-06  Launch from Kennedy Space Center @ 12:56 UTC\n   1979-Mar-05  Jupiter closest-approach, Io imaging\n   1980-Nov-12  Saturn encounter, Titan\n   1990-Jan-01  Interstellar mission begins\n   1990-Feb-14  Final Voyager image return\n   1992-Apr-24  Final two-way tracking measurements\n   1998-Feb-17  Exceeds Pioneer 10 distance (most distant man-made object)\n   2004-Dec-15  Crosses solar system \"bow shock\" boundary\n   2012-Aug-25  Passes heliopause and termination shock boundary\n\n SPACECRAFT TRAJECTORY:\n   This trajectory is composed of two merged sections:\n\n     #1) 1977-Sep-5 to 1981-Jan-1:\n          A patched conic mission-design type trajectory in which the conics \n          were constructed to approximately match specific events, such as\n          satellite encounters, providing a rough accuracy. \n\n     #2) 1981-Jan-1 to 2100-Jan-1 \n          Refit of tracking data spanning 1981-1992 (end of two-way coherent \n          transponder data). Done in 2022 by R. Jacobson (former Voyager\n          navigation) using DE440 to generate a new solution and prediction. \n\n   The reconstruction done in 2022 estimated:\n      - Epoch state vector\n      - Constant and stochastic non-gravitational accelerations \n         (to account for the activity of three-axis attitude control system)\n      - Thermal radiation from RTG power sources\n      - Mismodelling of solar pressure  \n      - 96 impulsive maneuvers through Feb 1992\n\n   Note there has been no new tracking data possible since 1992. This is a\n   different issue from on-board telemetry, which continued beyond that date. \n\n   The 2022 update refit the existing old tracking data using modern approaches\n   and standards to allow consistent extrapolation to 2100.\n\n   Formal predicted geocentric pointing uncertainty on 2030-Jan-1:\n     RA +/- 1.701 arcseconds, DEC +/- 1.535 arcseconds\n\n   This uncertainty is consistent with the new solution's difference with \n   the A54206 prediction made in 1990. \n \n   Tracking data used in 2022 solution:\n     Points Type       First point            Last point       residual rms\n       2366   F2   01-JAN-1981 05:14:00  15-APR-1989 08:09:00  0.133 mm/s\n       2084   F3   07-JAN-1981 12:15:00  24-APR-1992 14:04:00  0.153 mm/s\n       5191  PRA   01-JAN-1981 03:52:18  20-JAN-1989 14:13:59  228 m\n         67  SRA   04-MAR-1989 10:58:56  13-OCT-1991 04:49:30  227 m\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Mon Sep 28 01:18:26 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Voyager 1 (spacecraft) (-31)    {source: Voyager_1_ST+refit2022_m}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 1977-Sep-06 00:00:00.0000 TDB\nStop  time      : A.D. 2026-Dec-01 00:00:00.0000 TDB\nStep-size       : 14400 minutes\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************",
+  "rows": 1799,
+  "jd_start": 2443392.5,
+  "jd_end": 2461372.5,
+  "note": "Ephemeris in SSB / ICRF / TDB with VEC_CORR=NONE"
+}

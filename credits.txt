@@ -1,0 +1,46 @@
+================================================================================
+VOYAGER 1 — LIGHT DAY GAP (하루 늦게 도착하는 우리)
+5분 영상 미디어아트 제작 크레딧 및 과학 데이터 출처
+================================================================================
+
+[기획 및 연출]
+- 프로젝트: oj-o/voyager1_LightDayGap
+- 작품명: VOYAGER 1 — LIGHT DAY GAP (하루 늦게 도착하는 우리)
+- 사양: 300초 (5분), 30fps, 총 9,000프레임 (프레임 0~8999), 48kHz 스테레오 오디오
+
+[천체 동역학 및 궤도 데이터]
+- NASA JPL Horizons System (SSD API)
+  * DE441 태양계 질량중심력학 역서
+  * Voyager 1 Trajectory Solution: Voyager_1_ST+refit2022_m
+  * 좌표계: 태양계 질량중심 (SSB, 500@0), ICRF 관성좌표계, TDB 시간척도
+  * 대상 천체: Voyager 1 (-31), Earth (399), Sun (10), Jupiter (599), Saturn (699)
+  * 보정 옵션: VEC_CORR=NONE (기하학적 광행시간 직접 반복 수치해법 적용)
+
+[우주선 측정 및 계측 자료]
+- NASA Jet Propulsion Laboratory (JPL-Caltech)
+  * Voyager 1 Mission Archive & Instrument Telemetry Status (MAG, PWS, RTG)
+  * "Pale Blue Dot" Photograph (1990-02-14, PIA00452)
+- University of Iowa Department of Physics and Astronomy
+  * Voyager 1 Plasma Wave Investigation (PWS)
+  * Interstellar Electron Plasma Oscillations sonification records (2012–2013)
+
+[물리 모형 및 상수]
+- 진공 광속 c = 299,792.458 km/s (NIST SI 정의 상수)
+- 1 천문단위 1 AU = 149,597,870.7 km (IAU 표준)
+- 1 광일 = c × 86,400 s = 25,902,068,371.2 km (약 173.1446 AU)
+- 태양 중력상수 GM = 1.32712440042 × 10¹¹ km³/s²
+- 플루토늄-238(Pu-238) 방사성 동위원소 열전 발전기(RTG) 붕괴 모형 (반감기 88년)
+- 특수상대론 운동 시간 지연 (17 km/s 등속 모형 기준 138.91 μs/일)
+- 일반상대론 약한 중력장 태양 퍼텐셜 및 속도 시간 지연 모형 (+1.156 ms/일)
+
+[폰트 및 타이포그래피]
+- Noto Sans KR (Google Fonts / SIL Open Font License)
+- DM Mono (Google Fonts / SIL Open Font License)
+- Malgun Gothic (Microsoft Corporation)
+
+[소프트웨어 툴체인]
+- Python 3.14.4 & Astral uv Package Manager
+- NumPy, SciPy, Pillow (PIL), Astropy, ImageIO, FFmpeg 7.1
+- HTML5 Canvas & Web Audio API (실시간 반응형 웹 시안)
+
+================================================================================

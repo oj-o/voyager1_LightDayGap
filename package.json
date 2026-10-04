@@ -1,20 +1,18 @@
 {
-  "name": "voyager1-teaser",
-  "version": "1.0.0",
-  "description": "보이저 1호 49년 만의 1광일(259억 km) 도달 티저 영상 및 인터랙티브 모션 애플리케이션",
-  "main": "index.html",
+  "name": "voyager1-light-day-gap",
+  "version": "1.1.0",
+  "private": true,
+  "description": "A five-minute Voyager 1 light-time media-art concept preview.",
   "scripts": {
     "start": "npx -y serve .",
     "dev": "npx -y serve ."
   },
   "keywords": [
-    "voyager1",
-    "space",
-    "teaser",
-    "video",
+    "voyager-1",
+    "media-art",
     "canvas",
-    "web-audio"
+    "light-time",
+    "space"
   ],
-  "author": "oj-o",
   "license": "MIT"
 }

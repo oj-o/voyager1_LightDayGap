@@ -1,0 +1,77 @@
+{
+  "title": "VOYAGER 1 — LIGHT DAY GAP (하루 늦게 도착하는 우리)",
+  "production_date": "2026-09-28",
+  "repository": "https://github.com/oj-o/voyager1_LightDayGap",
+  "specification_reference": "docs/film_spec.md",
+  "config": "config/film.json",
+  "video": {
+    "duration_s": 300.0,
+    "fps": 30,
+    "total_frames": 9000,
+    "last_frame_index": 8999,
+    "preview_resolution": "1920x1080",
+    "final_resolution": "3840x2160",
+    "pixel_format": "yuv420p",
+    "codec": "libx264 (H.264)",
+    "crf": 18,
+    "preset": "slow / fast"
+  },
+  "audio": {
+    "sample_rate_hz": 48000,
+    "channels": 2,
+    "format": "16-bit PCM WAV / 320k AAC",
+    "duration_s": 300.0,
+    "total_samples": 14400000,
+    "samples_per_video_frame": 1600
+  },
+  "scientific_ephemeris": {
+    "origin": "SSB (Solar System Barycenter, 500@0)",
+    "frame": "ICRF (REF_PLANE=FRAME, REF_SYSTEM=ICRF)",
+    "time_scale": "TDB",
+    "target_ids": {
+      "voyager_1": "-31",
+      "earth": "399",
+      "sun": "10",
+      "jupiter": "599",
+      "saturn": "699"
+    },
+    "trajectories": {
+      "event_voyager1": "data/raw/event_voyager1_-31_f6495a5a5604.csv",
+      "event_earth": "data/raw/event_earth_399_43714a9c51ea.csv",
+      "event_sun": "data/raw/event_sun_10_db161e986fa6.csv",
+      "mission_voyager1": "data/raw/traj_voyager1_-31_2fe506551e99.csv",
+      "mission_earth": "data/raw/traj_earth_399_7df65157c69c.csv",
+      "mission_sun": "data/raw/traj_sun_10_79a8453b012c.csv"
+    },
+    "verified_anchor": {
+      "anchor_utc": "2026-11-18T10:16:07Z",
+      "anchor_tdb_s": 848269036.183,
+      "distance_km": 25902068371.317,
+      "distance_au": 173.1446,
+      "range_rate_km_s": 25.4073,
+      "geometric_crossing_utc": "2026-11-18T10:16:06.996Z",
+      "reception_emission_utc": "2026-11-17T10:16:09.517Z",
+      "reception_delay_s": 86397.483,
+      "transmission_receive_utc": "2026-11-19T10:16:11.863Z",
+      "transmission_delay_s": 86404.863,
+      "instant_round_trip_s": 172814.415,
+      "sr_coordinate_lag_us_per_day": 138.91,
+      "gr_weak_field_rate_diff_ms_per_day": 1.156,
+      "earth_apparent_angular_diameter_arcsec": 0.101468,
+      "sun_apparent_angular_diameter_arcsec": 11.1286
+    }
+  },
+  "software_dependencies": {
+    "python": "3.14.4",
+    "uv": "0.11.7",
+    "numpy": "2.5.3",
+    "pillow": "12.3.0",
+    "scipy": "1.18.1",
+    "astropy": "8.0.1",
+    "imageio-ffmpeg": "0.6.0 (FFmpeg 7.1)"
+  },
+  "fonts": [
+    "Noto Sans KR (NotoSansKR-VF.ttf)",
+    "Malgun Gothic (malgun.ttf)"
+  ]
+}

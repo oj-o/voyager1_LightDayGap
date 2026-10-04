@@ -1,0 +1,13 @@
+{
+  "generated_at_utc": "2026-09-28T08:18:31.407493+00:00",
+  "datasets": {
+    "event_voyager1": "data\\raw\\event_voyager1_-31_f6495a5a5604.csv",
+    "event_earth": "data\\raw\\event_earth_399_43714a9c51ea.csv",
+    "event_sun": "data\\raw\\event_sun_10_db161e986fa6.csv",
+    "traj_voyager1": "data\\raw\\traj_voyager1_-31_2fe506551e99.csv",
+    "traj_earth": "data\\raw\\traj_earth_399_7df65157c69c.csv",
+    "traj_sun": "data\\raw\\traj_sun_10_79a8453b012c.csv",
+    "flyby_jupiter": "data\\raw\\flyby_jupiter_599_9dae79e390c6.csv",
+    "flyby_saturn": "data\\raw\\flyby_saturn_699_0c6f30aa091e.csv"
+  }
+}

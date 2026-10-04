@@ -1,0 +1,20 @@
+{
+  "anchor_utc": "2026-11-18T10:16:07",
+  "anchor_tdb_s": 848269036.1828194,
+  "geometric_distance_at_anchor_km": 25902068371.31666,
+  "range_rate_at_anchor_km_s": 25.407283493636577,
+  "geometric_crossing_utc": "2026-11-18T10:16:06.996",
+  "geometric_crossing_tdb_s": 848269036.1789703,
+  "reception_emission_utc": "2026-11-17T10:16:09.517",
+  "reception_delay_s": 86397.48305113552,
+  "transmission_receive_utc": "2026-11-19T10:16:11.863",
+  "transmission_delay_s": 86404.86297417362,
+  "round_trip_s": 172814.41489124298,
+  "voyager_speed_km_s": 16.912281042251713,
+  "earth_speed_km_s": 30.119057374785005,
+  "sr_lag_17_us_day": 138.91213430985218,
+  "sr_lag_actual_us_day": 137.48227664677694,
+  "gr_diff_ms_day": 1.1563114597713244,
+  "earth_angular_diameter_arcsec": 0.1014678103510407,
+  "sun_angular_diameter_arcsec": 11.128624518481143
+}

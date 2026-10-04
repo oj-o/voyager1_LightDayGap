@@ -1,0 +1,31 @@
+{
+  "fetched_at_utc": "2026-09-28T08:18:30.551811+00:00",
+  "target": "599",
+  "label": "flyby_jupiter",
+  "parameters": {
+    "format": "json",
+    "COMMAND": "'599'",
+    "OBJ_DATA": "'YES'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'VECTORS'",
+    "CENTER": "'500@0'",
+    "REF_SYSTEM": "'ICRF'",
+    "REF_PLANE": "'FRAME'",
+    "OUT_UNITS": "'KM-S'",
+    "VEC_CORR": "'NONE'",
+    "VEC_TABLE": "'2'",
+    "CSV_FORMAT": "'YES'",
+    "TIME_TYPE": "'TDB'",
+    "TIME_DIGITS": "'FRACSEC'",
+    "START_TIME": "'1979-02-25'",
+    "STOP_TIME": "'1979-03-15'",
+    "STEP_SIZE": "'6 h'"
+  },
+  "source_url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27599%27&OBJ_DATA=%27YES%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&OUT_UNITS=%27KM-S%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TIME_DIGITS=%27FRACSEC%27&START_TIME=%271979-02-25%27&STOP_TIME=%271979-03-15%27&STEP_SIZE=%276+h%27",
+  "raw_sha256": "00f22eb5da544a8e48a607962d6abbddc16f857b2a6d929a9ebf9f621407c659",
+  "response_header": "*******************************************************************************\n Revised: April 12, 2021               Jupiter                              599\n \n PHYSICAL DATA (revised 2025-Jan-30):\n  Mass x 10^26 (kg)     = 18.9819           Density (g/cm^3)  = 1.3262 +- .0003\n  Equat. radius (1 bar) = 71492+-4 km       Polar radius (km)     = 66854+-10\n  Vol. Mean Radius (km) = 69911+-6          Flattening            = 0.06487\n  Geometric Albedo      = 0.52              Rocky core mass (Mc/M)= 0.0261\n  Sid. rot. period (III)= 9h 55m 29.711 s   Sid. rot. rate (rad/s)= 0.00017585\n  Mean solar day, hrs   = ~9.9259         \n  GM (km^3/s^2)         = 126686531.900     GM 1-sigma (km^3/s^2) =  +- 1.2732\n  Equ. grav, ge (m/s^2) = 24.79             Pol. grav, gp (m/s^2) =  28.34\n  Vis. magnitude V(1,0) = -9.40\n  Vis. mag. (opposition)= -2.70             Obliquity to orbit    =  3.13 deg\n  Sidereal orbit period = 11.861982204 y    Sidereal orbit period = 4332.589 d\n  Mean daily motion     = 0.0831294 deg/d   Mean orbit speed, km/s= 13.0697\n  Atmos. temp. (1 bar)  = 165+-5 K          Escape speed, km/s    =  59.5           \n  A_roche(ice)/Rp       =  2.76             Hill's sphere rad. Rp = 740\n                                 Perihelion   Aphelion     Mean\n  Solar Constant (W/m^2)         56           46           51\n  Maximum Planetary IR (W/m^2)   13.7         13.4         13.6\n  Minimum Planetary IR (W/m^2)   13.7         13.4         13.6\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Mon Sep 28 01:18:30 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Jupiter (599)                   {source: jup365_merged}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 1979-Feb-25 00:00:00.0000 TDB\nStop  time      : A.D. 1979-Mar-15 00:00:00.0000 TDB\nStep-size       : 360 minutes\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************",
+  "rows": 73,
+  "jd_start": 2443929.5,
+  "jd_end": 2443947.5,
+  "note": "Ephemeris in SSB / ICRF / TDB with VEC_CORR=NONE"
+}

@@ -1,54 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Light-Day Gap</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#03060b">
+    <meta name="description" content="Voyager 1 — Light Day Gap, a cinematic fulldome planetarium experience from Voyager 1's perspective.">
+    <title>VOYAGER 1 — LIGHT DAY GAP (보이저 1호의 시선)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="experience" aria-labelledby="title">
+      <canvas id="artCanvas" aria-label="보이저 1호의 시점으로 바라본 1광일의 시공간 미디어아트"></canvas>
 
-  <!-- Square fisheye dome master. Plays itself, once, for 300s — no audience interaction needed.
-       The panel below is a producer/preview tool only: hidden until the mouse moves,
-       so it stays invisible during an actual dome show where no one touches a mouse. -->
-  <canvas id="artCanvas"></canvas>
+      <header class="masthead">
+        <p class="eyebrow">VOYAGER 1 PERSPECTIVE · FULLDOME &amp; CINEMATIC · 210 S (3M 30S) · 6,300 FRAMES</p>
+        <h1 id="title">VOYAGER 1 <span>—</span> LIGHT DAY GAP</h1>
+        <p class="subtitle">하루 늦게 도착하는 우리 (보이저 1호의 시선)</p>
+      </header>
 
-  <div class="dome-panel" id="domePanel">
-    <div class="panel-card">
-      <div class="chapters">
-        <button class="chapter-btn" data-t="0">EARTH</button>
-        <button class="chapter-btn" data-t="40">JUPITER</button>
-        <button class="chapter-btn" data-t="80">SATURN</button>
-        <button class="chapter-btn" data-t="130">COMETS</button>
-        <button class="chapter-btn" data-t="180">HELIOPAUSE</button>
-        <button class="chapter-btn" data-t="220">NOW</button>
-        <button class="chapter-btn" data-t="270">FUTURE</button>
-      </div>
-      <select id="recordDuration" class="chapter-btn duration-select" title="Recording length">
-        <option value="1">1M</option>
-        <option value="5" selected>5M</option>
-        <option value="10">10M</option>
-        <option value="40">40M</option>
-      </select>
-      <button id="btnRecord" class="record-btn">● RECORD</button>
-    </div>
-  </div>
+      <section class="readout" aria-live="polite">
+        <p id="sceneId" class="readout-id">S01</p>
+        <h2 id="sceneTitle">어둠 속의 신호</h2>
+        <p id="sceneMeta">259억 km 심연 · 가상 수신 사건</p>
+      </section>
 
-  <!-- Appears only while a recording (via the RECORD button) is in progress -->
-  <div class="render-modal" id="renderModal">
-    <div class="render-card">
-      <div class="spinner"></div>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="renderProgress"></div>
-      </div>
-      <span id="renderStatusText" class="status-num">0%</span>
-      <div id="renderTimeText" class="time-num">00:00 / 00:00</div>
-    </div>
-  </div>
+      <section class="science-note" aria-label="데이터 상태">
+        <span class="status-dot connected" aria-hidden="true"></span>
+        <p><strong>보이저 1호 가상 시점 연동</strong><br>NASA JPL Horizons 궤도역학 벡터 역산</p>
+      </section>
 
-  <script src="script.js"></script>
-</body>
+      <section class="caption" aria-live="polite">
+        <p id="captionText">칠흑의 우주에서, 어제의 지구가 보낸 신호가 내게 닿았다.</p>
+        <p id="simpleHudText" class="simple-hud">지구와의 거리: 1광일 (259억 km) · 신호 지연: 약 24시간</p>
+      </section>
+
+      <footer class="control-dock">
+        <div class="transport" aria-label="미리보기 제어">
+          <button id="playButton" type="button" aria-pressed="false">일시정지</button>
+          <button id="muteButton" type="button" aria-pressed="false">소리 켜기</button>
+          <button id="domeButton" type="button" class="btn-dome" aria-pressed="false">돔 스크린 180° OFF</button>
+          <div class="record-group">
+            <button id="recordButton" type="button" class="btn-record" aria-pressed="false" title="화면을 비디오 파일로 직접 녹화합니다">● 녹화 시작</button>
+            <select id="recordModeSelect" class="record-select" title="녹화 모드 선택">
+              <option value="full">전체 3분 30초 자동 녹화</option>
+              <option value="manual">현재 구간 자유 녹화</option>
+            </select>
+          </div>
+          <button id="explainButton" type="button" class="btn-explain" aria-haspopup="dialog" aria-expanded="false">📖 작품 및 연출 설명</button>
+          <button id="essayButton" type="button" aria-haspopup="dialog" aria-expanded="false">비평 전문</button>
+          <span id="clock" class="clock">00:00 / 03:30</span>
+        </div>
+
+        <label class="scrubber-label" for="timeline">장면 타임라인</label>
+        <input id="timeline" type="range" min="0" max="210" value="0" step="0.01">
+        <div id="chapterMarkers" class="chapter-markers" aria-label="장면 바로가기"></div>
+      </footer>
+
+      <!-- Explanation Modal: Story & Fulldome Presentation Guide -->
+      <aside id="explainModal" class="essay-modal" aria-hidden="true" role="dialog" aria-labelledby="explainTitle">
+        <div class="essay-card">
+          <header class="essay-header">
+            <div>
+              <p class="eyebrow">STORY &amp; FULLDOME DIRECTING GUIDE</p>
+              <h2 id="explainTitle">작품 및 연출 설명서</h2>
+              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (보이저 1호의 시선)</p>
+            </div>
+            <button id="closeExplainButton" class="close-btn" type="button" aria-label="설명 닫기">✕</button>
+          </header>
+
+          <div class="essay-body">
+            <blockquote>
+              “칠흑의 우주에서, 어제의 지구가 보낸 신호가 내 차가운 안테나에 닿았다.<br>
+              우리는 같은 우주에 있지만 결코 같은 현재를 공유할 수 없다.”
+            </blockquote>
+
+            <h3>1. 보이저 1호 1인칭 시점 서사</h3>
+            <p>
+              본 작품은 관찰자의 3인칭 과학 해설을 탈피하여, 1977년 지구를 떠난 탐사선 <strong>보이저 1호(Voyager 1)의 내면 독백과 가상 시선</strong>으로 시청각적 스토리텔링을 전개합니다.
+            </p>
+            <ul>
+              <li><strong>S01 어둠 속의 신호 (00:00~00:15):</strong> 259억 km 밖에서 24시간 전 어제의 지구가 보낸 신호를 수신하는 순간.</li>
+              <li><strong>S02 떠나온 49년의 궤적 (00:15~00:45):</strong> 목성과 토성의 중력도움을 받아 태양권을 넘어 성간 공간으로 진입한 49년간의 항로.</li>
+              <li><strong>S03 마지막으로 본 집 (00:45~01:10):</strong> 1990년 칼 세이건의 제안으로 촬영된 '창백한 푸른 점' 이후 영구 정지된 카메라의 시선(0.1015초각의 미세한 점).</li>
+              <li><strong>S04 1광일의 심연 (01:10~01:45):</strong> 빛조차 하루가 걸리는 259억 km(173.1 AU)의 시공간적 간극.</li>
+              <li><strong>S05 두 장소의 하루 (01:45~02:15):</strong> 보이저가 147만 km 나아가는 동안, 지구는 태양 주위를 257만 km 공전하는 서로 다른 하루.</li>
+              <li><strong>S06 엇갈리는 시계 (02:15~02:40):</strong> 특수상대론적 속도 지연(하루 139 μs)으로 인해 지구 시계와 보이저 시계의 미세한 분열.</li>
+              <li><strong>S07 성간의 떨림 (02:40~03:00):</strong> 눈은 감겼지만 PWS 안테나를 울리는 성간 플라스마 진동(2.2~3.0 kHz)의 소리화.</li>
+              <li><strong>S08 원자의 심박수 (03:00~03:18):</strong> RTG 플루토늄-238 붕괴열로 20와트 미약한 전파를 생성해 지구로 띄우는 지속적 미열.</li>
+              <li><strong>S09 내일로 보내는 응답 (03:18~03:30):</strong> “내가 보낸 오늘이 내일의 당신들에게 닿기를. 안녕, 나의 지구.”</li>
+            </ul>
+
+            <h3>2. 천체투영관 돔 스크린(Fulldome 180°) 연출 설계</h3>
+            <p>
+              하단의 <strong>[돔 스크린 180°]</strong> 토글 버튼을 켜면 전 세계 천체투영관 및 돔 극장의 표준 규격인 <strong>1:1 원형 어안 돔마스터(Circular Fisheye Domemaster)</strong> 투영 모드가 활성화됩니다:
+            </p>
+            <ul>
+              <li><strong>천정(Zenith) 중심 투영:</strong> 화면 정중앙이 관객의 머리 바로 위 천정(고도 90°)에 위치하며, 외곽 원형 림이 지평선(Horizon, 고도 0°)에 대응합니다.</li>
+              <li><strong>방위각/고도 그리드 가이드:</strong> 30도, 60도 고도 동심원과 동서남북(E, W, S, N) 방위각 십자선이 돔 곡면에 완벽히 정렬됩니다.</li>
+              <li><strong>주변부 왜곡 방지 및 안전 영역(Dome Safe Area):</strong> 시각적 핵심 정보와 자막을 돔 하단 림에 묻히지 않도록 고도 35°~65° 사이의 스위트 스팟에 배치했습니다.</li>
+            </ul>
+
+            <h3>3. 브라우저 실시간 녹화 기능 안내</h3>
+            <p>
+              하단의 <strong>[● 녹화 시작]</strong> 버튼을 누르면 Canvas 스트림과 합성 사운드를 직접 캡처하여 브라우저에서 즉시 WebM/MP4 비디오 파일로 다운로드할 수 있습니다:
+            </p>
+            <ul>
+              <li><strong>전체 3분 30초 자동 녹화:</strong> 시작점(00:00)부터 210초 끝까지 재생되며 영상 완성 시 자동으로 파일이 다운로드됩니다.</li>
+              <li><strong>현재 구간 자유 녹화:</strong> 원하는 시점부터 녹화를 시작하고 [녹화 중지] 버튼을 눌러 언제든지 저장할 수 있습니다.</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Curatorial Essay & Critical Review Modal -->
+      <aside id="essayModal" class="essay-modal" aria-hidden="true" role="dialog" aria-labelledby="essayTitle">
+        <div class="essay-card">
+          <header class="essay-header">
+            <div>
+              <p class="eyebrow">CURATORIAL ESSAY &amp; CRITICAL REVIEW</p>
+              <h2 id="essayTitle">빛의 하루, 지연된 존재론 (보이저 1호의 시선)</h2>
+              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (하루 늦게 도착하는 우리)</p>
+            </div>
+            <button id="closeEssayButton" class="close-btn" type="button" aria-label="해설 닫기">✕</button>
+          </header>
+
+          <div class="essay-body">
+            <blockquote>
+              “칠흑의 심연 속에서, 어제의 지구가 보낸 신호가 내 차가운 안테나에 닿았다.<br>
+              내가 보는 당신들은 언제나 어제의 모습이고, 내가 보낸 오늘 역시 내일의 당신들에게 닿을 것이다.”
+            </blockquote>
+
+            <h3>1. 돔 스크린에 새겨진 1광일의 고독</h3>
+            <p>
+              본 작품은 2026년 11월 18일, 인류가 우주로 쏘아 올린 가장 먼 사물이자 최초의 성간 탐사선인 <strong>보이저 1호(Voyager 1)</strong>가 지구로부터 <strong>정확히 1광일(Light-Day, 약 259억 km)</strong> 떨어진 지점을 통과하는 순간을 다룹니다.
+            </p>
+            <p>
+              천체투영관 돔 스크린(Fulldome) 화면 전체를 180도 반구형 심연으로 전환하여, 관객이 객석에 누워 천정을 바라볼 때 스스로가 성간 공간에 홀로 떠 있는 보이저 1호의 동체와 시선이 되도록 연출했습니다. 복잡한 수치와 설명문단을 걷어내고, 영화적이고 시적인 1인칭 독백과 직관적인 핵심 정보만으로 우주적 시공간의 어긋남을 감각하도록 각색되었습니다.
+            </p>
+
+            <h3>2. 꺼진 눈과 기억 속의 창백한 푸른 점</h3>
+            <p>
+              1990년 2월 14일, 보이저 1호는 인류 역사상 가장 고귀한 가족사진이자 ‘창백한 푸른 점(Pale Blue Dot)’을 촬영한 직후 카메라의 전원을 영구히 차단했습니다. 따라서 1광일 거리에서 보이저가 마주하는 지구의 모습은 실사 이미지가 아니라, 궤도역학과 빛의 지연 방정식을 역산하여 구축한 <strong>‘계산된 가상의 시선’</strong>입니다.
+            </p>
+            <p>
+              이 거리에서 지구의 시직경은 0.1015초각에 불과한 극미세 점광원입니다. 화려한 시각적 과장을 걷어내고 남은 이 침묵의 점광원은, 광대한 우주 속에서 우리가 기원한 고향의 덧없음과 아름다움을 증언합니다.
+            </p>
+
+            <h3>3. 원자의 맥박: 어제의 당신들에게 띄우는 오늘의 안부</h3>
+            <p>
+              영하 200도를 밑도는 성간의 암흑 속에서 20와트 남짓의 미약한 전파를 지구로 쏘아 올리는 힘은, 탐사선 심장에 실린 <strong>플루토늄-238(Pu-238) 원자핵의 미세한 붕괴열</strong>입니다.
+            </p>
+            <p>
+              우리는 같은 우주에 존재하지만, 서로의 ‘현재’를 결코 동시에 공유할 수 없습니다. 보이저가 보낸 신호가 지구에 닿을 때, 그곳의 우리는 이미 하루를 더 살아낸 뒤입니다. 이 작품은 타자와의 연결이란 상대방의 현재를 소유하는 것이 아니라, 그가 지나온 어제의 흔적을 경청하고 침묵을 품어 안는 일임을 보여줍니다.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </main>
+    <script src="script.js"></script>
+  </body>
 </html>
