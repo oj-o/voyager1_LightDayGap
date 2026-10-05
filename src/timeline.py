@@ -55,6 +55,9 @@ class Timeline:
             "scene_description": scene.get("description", ""),
             "scene_narration": scene.get("narration", ""),
             "scene_simple_hud": scene.get("simple_hud", ""),
+            "scene_dome_science_tag": scene.get("dome_science_tag", ""),
+            "scene_dome_caption": scene.get("dome_caption", []),
+            "dome_subtitle_settings": self.config.get("dome_subtitles", {}),
             "local_progress": local_u,
             "local_time_s": t_video - scene["start"],
             "scene_duration_s": scene["end"] - scene["start"]

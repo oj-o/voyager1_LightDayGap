@@ -190,27 +190,95 @@ class SceneRenderer:
         black_bg = Image.new("RGB", (self.w, self.h), (0, 0, 0))
         return Image.composite(img, black_bg, mask)
 
+    def _fit_font(self, draw: ImageDraw.ImageDraw, texts, max_width: int, start_size: int, min_size: int, bold: bool = False):
+        """Return the largest Korean font that keeps every supplied line inside max_width."""
+        for size in range(start_size, min_size - 1, -2):
+            font = font_mgr.get_font(size, bold=bold)
+            if all(draw.textbbox((0, 0), text, font=font)[2] <= max_width for text in texts if text):
+                return font
+        return font_mgr.get_font(min_size, bold=bold)
+
+    def _draw_centered_text(self, draw: ImageDraw.ImageDraw, cx: int, y: int, text: str, font, fill):
+        bbox = draw.textbbox((0, 0), text, font=font)
+        draw.text((cx - (bbox[2] - bbox[0]) // 2, y), text, font=font, fill=fill)
+
+    def draw_dome_safe_caption(self, draw: ImageDraw.ImageDraw, state: Dict[str, Any]):
+        """Draw short, horizontal captions close to the zenith of a Domemaster.
+
+        Full-dome images stretch rapidly near the horizon.  Keeping the complete
+        caption card inside the configured central dome radius makes the text readable from
+        a seated audience without pretending that edge text is distortion-free.
+        """
+        cx, cy, r = int(self.dome_cx), int(self.dome_cy), self.dome_radius
+        settings = state.get("dome_subtitle_settings", {})
+        safe_ratio = float(settings.get("safe_radius_ratio", 0.36))
+        safe_radius = r * safe_ratio
+        max_card_width = int(safe_radius * 1.67)
+        max_text_width = int(safe_radius * 1.45)
+
+        title = state.get("scene_title", "")
+        title_font = self._fit_font(draw, [title], max_text_width, int(self.h * 0.018), int(self.h * 0.012), bold=True)
+        self._draw_centered_text(draw, cx, int(cy - safe_radius * 0.89), title, title_font, COLORS["white"])
+
+        tag = state.get("scene_dome_science_tag", "")
+        if tag:
+            tag_font = self._fit_font(draw, [tag], max_text_width, int(self.h * 0.013), int(self.h * 0.010), bold=True)
+            self._draw_centered_text(draw, cx, int(cy - safe_radius * 0.68), tag, tag_font, COLORS["earth_cyan"])
+
+        lines = [line for line in state.get("scene_dome_caption", []) if line]
+        if not lines:
+            lines = [state.get("scene_caption", "")]
+        lines = lines[:int(settings.get("max_lines", 2))]
+        caption_font = self._fit_font(draw, lines, max_text_width, int(self.h * 0.018), int(self.h * 0.013), bold=True)
+        fact = state.get("scene_simple_hud", "")
+        fact_font = self._fit_font(draw, [fact], max_text_width, int(self.h * 0.011), int(self.h * 0.008))
+
+        line_height = int(self.h * 0.024)
+        caption_height = max(1, len(lines)) * line_height
+        fact_height = int(self.h * 0.022) if fact else 0
+        pad_y = int(self.h * 0.012)
+        card_h = caption_height + fact_height + pad_y * 2
+        content_widths = [draw.textbbox((0, 0), line, font=caption_font)[2] for line in lines]
+        if fact:
+            content_widths.append(draw.textbbox((0, 0), fact, font=fact_font)[2])
+        card_w = max(
+            int(r * 0.42),
+            min(max_card_width, max(content_widths) + int(self.h * 0.04))
+        )
+        card_cy = int(cy + safe_radius * 0.42)
+        card_x = int(cx - card_w * 0.5)
+        card_y = int(card_cy - card_h * 0.5)
+        draw.rounded_rectangle(
+            [card_x, card_y, card_x + card_w, card_y + card_h],
+            radius=max(8, int(self.h * 0.006)),
+            fill=COLORS["panel_bg"],
+            outline=COLORS["panel_border"],
+            width=max(1, int(self.h * 0.0007))
+        )
+
+        text_y = card_y + pad_y
+        for line in lines:
+            self._draw_centered_text(draw, cx, text_y, line, caption_font, COLORS["white"])
+            text_y += line_height
+        if fact:
+            self._draw_centered_text(draw, cx, text_y, fact, fact_font, COLORS["voyager_gold"])
+
     def draw_cinematic_hud(self, draw: ImageDraw.ImageDraw, state: Dict[str, Any]):
         """Render concise, cinema-like first-person captions and intuitive minimal HUD."""
-        f_title = font_mgr.get_font(int(self.h * 0.024), bold=True)
-        f_hud = font_mgr.get_font(int(self.h * 0.015))
-        f_caption = font_mgr.get_font(int(self.h * 0.025), bold=True)
-
-        # Safe margins depending on dome mode
         if state.get("scene_id") == "S00":
             return  # S00 prologue renders its own complete intro title & artwork description card
 
         if self.dome_mode:
-            # Inside safe sweet spot of dome (around altitude 45-60)
-            top_y = int(self.dome_cy - self.dome_radius * 0.72)
-            bottom_y = int(self.dome_cy + self.dome_radius * 0.65)
-            hud_y = int(self.dome_cy + self.dome_radius * 0.76)
-            center_x = int(self.dome_cx)
-        else:
-            top_y = int(self.h * 0.05)
-            bottom_y = int(self.h * 0.86)
-            hud_y = int(self.h * 0.92)
-            center_x = int(self.w * 0.5)
+            self.draw_dome_safe_caption(draw, state)
+            return
+
+        f_title = font_mgr.get_font(int(self.h * 0.024), bold=True)
+        f_hud = font_mgr.get_font(int(self.h * 0.015))
+        f_caption = font_mgr.get_font(int(self.h * 0.025), bold=True)
+        top_y = int(self.h * 0.05)
+        bottom_y = int(self.h * 0.86)
+        hud_y = int(self.h * 0.92)
+        center_x = int(self.w * 0.5)
 
         # Upper Scene Header (Clean & Minimal)
         title_str = f"VOYAGER 1  ·  {state['scene_title']}"
@@ -240,6 +308,36 @@ class SceneRenderer:
         u = state["local_progress"]
         cx = self.w * 0.5
         cy = self.h * 0.46
+
+        # Dome titles must stay near the zenith just like the subtitles.  A wide
+        # rectangular title card at the rim would look stretched after projection.
+        if self.dome_mode:
+            r = self.dome_radius
+            fade = min(1.0, max(0.0, math.sin(u * math.pi))) if u < 0.9 else (1.0 - u) / 0.1
+            f_kicker = font_mgr.get_font(int(self.h * 0.015), bold=True)
+            f_title = font_mgr.get_font(int(self.h * 0.034), bold=True)
+            f_subtitle = font_mgr.get_font(int(self.h * 0.018), bold=True)
+            f_fact = font_mgr.get_font(int(self.h * 0.013))
+            alpha = int(255 * fade)
+
+            self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.29), "VOYAGER 1", f_kicker, (104, 216, 232, alpha))
+            self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.21), "LIGHT DAY GAP", f_title, (232, 244, 247, alpha))
+            self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.10), "하루 늦게 도착하는 우리", f_subtitle, (216, 183, 120, alpha))
+
+            card_w = int(r * 0.58)
+            card_h = int(r * 0.17)
+            card_x = int(cx - card_w * 0.5)
+            card_y = int(self.dome_cy + r * 0.06)
+            draw.rounded_rectangle(
+                [card_x, card_y, card_x + card_w, card_y + card_h],
+                radius=max(8, int(self.h * 0.006)),
+                fill=(4, 12, 24, int(210 * fade)),
+                outline=(104, 216, 232, int(90 * fade)),
+                width=max(1, int(self.h * 0.0007))
+            )
+            self._draw_centered_text(draw, int(cx), card_y + int(card_h * 0.22), "빛은 즉시 도착하지 않는다.", f_subtitle, (232, 244, 247, alpha))
+            self._draw_centered_text(draw, int(cx), card_y + int(card_h * 0.57), "1광일 = 약 24시간 · MP4 · 3840×3840", f_fact, (216, 183, 120, alpha))
+            return
 
         # Fading curve for smooth entrance and transition
         fade = min(1.0, max(0.0, math.sin(u * math.pi))) if u < 0.9 else (1.0 - u) / 0.1
@@ -443,6 +541,33 @@ class SceneRenderer:
     # -------------------------------------------------------------
     def render_s05(self, draw: ImageDraw.ImageDraw, state: Dict[str, Any]):
         u = state["local_progress"]
+
+        # A pair of wide information panels works on a flat screen but crosses
+        # the high-distortion part of a dome.  In a dome, use short central bars
+        # instead so the Earth/Voyager speed contrast stays legible.
+        if self.dome_mode:
+            cx, cy, r = self.dome_cx, self.dome_cy, self.dome_radius
+            earth_speed = float(self.phys_summary.get("earth_speed_km_s", 30.1))
+            voyager_speed = float(self.phys_summary.get("voyager_speed_km_s", 16.9))
+            max_speed = max(earth_speed, voyager_speed)
+            bar_left = int(cx - r * 0.27)
+            bar_w = int(r * 0.50)
+            bar_h = max(8, int(self.h * 0.012))
+            f_label = font_mgr.get_font(int(self.h * 0.013), bold=True)
+            progress = 0.25 + 0.75 * min(1.0, u * 1.8)
+
+            for y_ratio, label, speed, color in [
+                (-0.15, "지구  %.1f km/s" % earth_speed, earth_speed, COLORS["earth_cyan"]),
+                (-0.04, "보이저  %.1f km/s" % voyager_speed, voyager_speed, COLORS["voyager_gold"]),
+            ]:
+                y = int(cy + r * y_ratio)
+                draw.rounded_rectangle([bar_left, y, bar_left + bar_w, y + bar_h], radius=bar_h // 2, fill=(30, 48, 62, 190))
+                filled_w = max(bar_h, int(bar_w * speed / max_speed * progress))
+                draw.rounded_rectangle([bar_left, y, bar_left + filled_w, y + bar_h], radius=bar_h // 2, fill=color)
+                draw.text((bar_left, y - int(self.h * 0.024)), label, font=f_label, fill=color)
+
+            return
+
         cx = self.w * 0.5
         cy = self.h * 0.46
         pw = int(min(self.w, self.h) * 0.38)
@@ -462,7 +587,7 @@ class SceneRenderer:
         draw_glow_circle(draw, e_cx, e_cy, 5.0, COLORS["earth_cyan"], alpha=0.3)
         draw.line([(e_cx, e_cy), (e_cx + e_dx, e_cy + e_dy)], fill=COLORS["earth_cyan"], width=2)
         draw_glow_circle(draw, e_cx + e_dx, e_cy + e_dy, 6.0, COLORS["earth_cyan"], alpha=1.0, glow_radius=14.0)
-        draw.text((p1_x + 14, y + ph - 28), "하루 257만 km 이동 (초속 29.8 km)", font=font_mgr.get_font(11), fill=COLORS["white"])
+        draw.text((p1_x + 14, y + ph - 28), "하루 약 260만 km 이동 (초속 약 30.1 km)", font=font_mgr.get_font(11), fill=COLORS["white"])
 
         # Panel 2: Voyager 24h motion
         draw.rounded_rectangle([p2_x, y, p2_x + pw, y + ph], radius=6, fill=COLORS["panel_bg"], outline=COLORS["panel_border"])
@@ -474,7 +599,7 @@ class SceneRenderer:
         draw_glow_circle(draw, v_cx, v_cy, 4.0, COLORS["voyager_gold"], alpha=0.3)
         draw.line([(v_cx, v_cy), (v_cx + v_dx, v_cy + v_dy)], fill=COLORS["voyager_gold"], width=2)
         draw_voyager_silhouette(draw, v_cx + v_dx, v_cy + v_dy, scale=0.75, alpha=1.0)
-        draw.text((p2_x + 14, y + ph - 28), "하루 147만 km 이동 (초속 16.9 km)", font=font_mgr.get_font(11), fill=COLORS["white"])
+        draw.text((p2_x + 14, y + ph - 28), "하루 약 146만 km 이동 (초속 약 16.9 km)", font=font_mgr.get_font(11), fill=COLORS["white"])
 
     # -------------------------------------------------------------
     # S06: 엇갈리는 시계 (02:15 - 02:40)
@@ -484,6 +609,9 @@ class SceneRenderer:
         cx = self.w * 0.5
         cy = self.h * 0.46
         r = int(min(self.w, self.h) * 0.12)
+        if self.dome_mode:
+            cy = self.dome_cy - self.dome_radius * 0.04
+            r = int(self.dome_radius * 0.09)
 
         c1_x = int(cx - r * 1.6)
         c2_x = int(cx + r * 1.6)
@@ -493,18 +621,35 @@ class SceneRenderer:
         draw.ellipse([c1_x - r, y - r, c1_x + r, y + r], outline=(232, 244, 247, 90), width=2)
         hand1_ang = u * math.pi * 8 - math.pi / 2
         draw.line([(c1_x, y), (c1_x + math.cos(hand1_ang) * r * 0.8, y + math.sin(hand1_ang) * r * 0.8)], fill=COLORS["earth_cyan"], width=3)
-        draw.text((c1_x - 45, y + r + 15), "지구의 시계", font=font_mgr.get_font(12, bold=True), fill=COLORS["earth_cyan"])
+        if not self.dome_mode:
+            draw.text((c1_x - 45, y + r + 15), "지구의 시계", font=font_mgr.get_font(12, bold=True), fill=COLORS["earth_cyan"])
 
         # Clock 2: Voyager Frame
         draw.ellipse([c2_x - r, y - r, c2_x + r, y + r], outline=(232, 244, 247, 90), width=2)
-        hand2_ang = hand1_ang - (139e-6 / 86400.0) * math.pi * 8
+        # Compare only the special-relativistic speed term in the same solar
+        # reference frame.  The much larger 24-hour effect in this film is
+        # light-travel time, not clock dilation.
+        earth_speed = float(self.phys_summary.get("earth_speed_km_s", 30.1))
+        voyager_speed = float(self.phys_summary.get("voyager_speed_km_s", 16.9))
+        c_km_s = 299792.458
+        daily_gap_s = 0.5 * ((earth_speed / c_km_s) ** 2 - (voyager_speed / c_km_s) ** 2) * 86400.0
+        visual_scale = 1_000_000  # Exaggerate the otherwise invisible hand offset for the dome graphic.
+        hand2_ang = hand1_ang - (daily_gap_s / 86400.0) * math.pi * 8 * visual_scale
         draw.line([(c2_x, y), (c2_x + math.cos(hand2_ang) * r * 0.8, y + math.sin(hand2_ang) * r * 0.8)], fill=COLORS["voyager_gold"], width=3)
-        draw.text((c2_x - 50, y + r + 15), "보이저의 시계", font=font_mgr.get_font(12, bold=True), fill=COLORS["voyager_gold"])
+        if not self.dome_mode:
+            draw.text((c2_x - 50, y + r + 15), "보이저의 시계", font=font_mgr.get_font(12, bold=True), fill=COLORS["voyager_gold"])
+
+        if self.dome_mode:
+            f_dome_label = font_mgr.get_font(int(self.h * 0.011), bold=True)
+            self._draw_centered_text(draw, c1_x, int(y - r - self.h * 0.026), "지구", f_dome_label, COLORS["earth_cyan"])
+            self._draw_centered_text(draw, c2_x, int(y - r - self.h * 0.026), "보이저", f_dome_label, COLORS["voyager_gold"])
+            return
 
         # Center subtle note
         f_m = font_mgr.get_font(12)
-        draw.text((cx - 100, y - 10), "상대론적 시간 지연", font=f_m, fill=COLORS["muted"])
-        draw.text((cx - 105, y + 10), "하루 약 139 마이크로초", font=f_m, fill=COLORS["voyager_gold"])
+        self._draw_centered_text(draw, int(cx), int(y - 10), "속도에 따른 상대론 효과", f_m, COLORS["muted"])
+        self._draw_centered_text(draw, int(cx), int(y + 10), f"실제 지구·보이저 차이: 하루 약 {daily_gap_s * 1e3:.2f} ms", f_m, COLORS["voyager_gold"])
+        self._draw_centered_text(draw, int(cx), int(y + 28), "시계 바늘 차이는 보기 쉽게 확대", font_mgr.get_font(10), COLORS["muted"])
 
     # -------------------------------------------------------------
     # S07: 성간의 떨림 (02:40 - 03:00)

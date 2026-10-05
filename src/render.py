@@ -9,6 +9,7 @@ Compliant with 4K UHD & 3~4 min cinematic dome format:
 """
 
 import argparse
+import json
 import subprocess
 import sys
 import time
@@ -26,6 +27,12 @@ from src.scenes.scenes import SceneRenderer
 def get_ffmpeg_path() -> str:
     """Retrieve bundled or system FFmpeg binary path."""
     return imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def load_render_config() -> dict:
+    """Read the single source of truth for dome dimensions and export format."""
+    config_path = Path(__file__).resolve().parent.parent / "config" / "film.json"
+    return json.loads(config_path.read_text(encoding="utf-8"))
 
 
 def render_single_frame(
@@ -100,6 +107,15 @@ def render_video(
     max_frames: int = None
 ):
     """Render full video sequence directly into FFmpeg video encoder pipe in 4K MP4 format."""
+    if Path(out_video_path).suffix.lower() != ".mp4":
+        raise ValueError("Final video exports must use the .mp4 container.")
+
+    render_config = load_render_config()
+    export_config = render_config.get("video_export", {})
+    video_codec = export_config.get("video_codec", "h264")
+    audio_codec = export_config.get("audio_codec", "aac")
+    pixel_format = export_config.get("pixel_format", "yuv420p")
+    ffmpeg_video_codec = "libx264" if video_codec == "h264" else video_codec
     ffmpeg_exe = get_ffmpeg_path()
     total_frames = int(duration_s * fps) if max_frames is None else min(int(duration_s * fps), max_frames)
     timeline = Timeline()
@@ -127,7 +143,7 @@ def render_video(
             "-i", str(audio_path),
             "-map", "0:v:0",
             "-map", "1:a:0",
-            "-c:a", "aac",
+            "-c:a", audio_codec,
             "-b:a", "320k",
             "-ar", "48000"
         ])
@@ -136,13 +152,15 @@ def render_video(
 
     dur_s = total_frames / float(fps)
     cmd.extend([
-        "-c:v", "libx264",
+        "-c:v", ffmpeg_video_codec,
         "-crf", str(crf),
         "-preset", preset,
-        "-pix_fmt", "yuv420p",
+        "-pix_fmt", pixel_format,
         "-r", str(fps),
         "-t", f"{dur_s:.3f}",
         "-movflags", "+faststart",
+        "-tag:v", "avc1",
+        "-f", "mp4",
         str(out_file)
     ])
 
@@ -180,16 +198,20 @@ if __name__ == "__main__":
     parser.add_argument("--snapshots", action="store_true", help="Export 4K scene snapshots")
     parser.add_argument("--frame", type=int, default=None, help="Render single frame index in 4K")
     parser.add_argument("--video", action="store_true", help="Render video in 4K MP4")
-    parser.add_argument("--dome", action="store_true", help="Fulldome 1:1 circular domemaster mode (3840x3840 / 2160x2160)")
+    parser.add_argument("--dome", action="store_true", help="Fulldome 1:1 circular Domemaster mode (3840x3840 by config)")
     parser.add_argument("--fhd", action="store_true", help="Render in 1080p FHD instead of default 4K UHD")
     parser.add_argument("--max-frames", type=int, default=None, help="Limit max frames for quick test")
+    parser.add_argument("--output", type=str, default=None, help="Output path for --video (must end in .mp4)")
     args = parser.parse_args()
 
+    render_config = load_render_config()
+
     if args.dome:
-        w = 2160 if args.fhd else 3840
-        h = 2160 if args.fhd else 3840
+        dome_master = render_config["dome_master"]
+        w = 2160 if args.fhd else int(dome_master["width"])
+        h = 2160 if args.fhd else int(dome_master["height"])
         is_dome = True
-        default_out = "output/Voyager1_LightDayGap_Fulldome_4K_3m45s.mp4"
+        default_out = f"output/Voyager1_LightDayGap_Fulldome_{w}x{h}_4K_3m45s.mp4"
     elif args.fhd:
         w = 1920
         h = 1080
@@ -208,7 +230,7 @@ if __name__ == "__main__":
         out_name = f"dome_frame_{args.frame:04d}.png" if is_dome else f"frame_{args.frame:04d}.png"
         render_single_frame(args.frame, width=w, height=h, dome_mode=is_dome, out_path=f"output/frames/{out_name}")
     elif args.video:
-        render_video(out_video_path=default_out, width=w, height=h, dome_mode=is_dome, max_frames=args.max_frames)
+        render_video(out_video_path=args.output or default_out, width=w, height=h, dome_mode=is_dome, max_frames=args.max_frames)
     else:
         # Default action: render scene snapshots
         export_scene_snapshots(width=w, height=h, dome_mode=is_dome)
