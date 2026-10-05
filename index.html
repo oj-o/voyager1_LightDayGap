@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#03060b">
-    <meta name="description" content="Voyager 1 — Light Day Gap, a cinematic fulldome planetarium experience from Voyager 1's perspective.">
-    <title>VOYAGER 1 — LIGHT DAY GAP (보이저 1호의 시선)</title>
+    <meta name="description" content="Voyager 1 — Light Day Gap, a 4K UHD and fulldome cinematic experience in MP4 format from Voyager 1's perspective.">
+    <title>VOYAGER 1 — LIGHT DAY GAP (4K UHD · MP4)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,49 +13,89 @@
   </head>
   <body>
     <main class="experience" aria-labelledby="title">
-      <canvas id="artCanvas" aria-label="보이저 1호의 시점으로 바라본 1광일의 시공간 미디어아트"></canvas>
+      <canvas id="artCanvas" aria-label="보이저 1호의 시점으로 바라본 1광일의 시공간 미디어아트 4K"></canvas>
+
+      <!-- Starting Screen Overlay with Artwork Description (시작 화면) -->
+      <section id="introScreen" class="intro-screen" aria-label="작품 시작 화면 및 설명">
+        <div class="intro-card">
+          <p class="eyebrow">4K UHD · FULLDOME 180° · MP4 CINEMATIC EXPERIENCE</p>
+          <h1 class="intro-title">VOYAGER 1 <span>—</span> LIGHT DAY GAP</h1>
+          <p class="intro-subtitle">하루 늦게 도착하는 우리 (보이저 1호의 시선)</p>
+
+          <div class="intro-quote">
+            “우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.<br>
+            보이저가 지구 쪽을 바라보는 가상의 순간, 그곳에 도착하는 것은 약 하루 전의 빛이다.”
+          </div>
+
+          <div class="intro-description">
+            <p>
+              <strong>작품 개요:</strong> 1977년 지구를 떠난 인류 최초의 성간 탐사선 <strong>보이저 1호(Voyager 1)</strong>는 2026년 11월 18일, 지구로부터 정확히 <strong>1광일(Light-Day, 약 259억 km)</strong> 떨어진 지점을 통과합니다.
+            </p>
+            <p>
+              1990년 '창백한 푸른 점'을 끝으로 눈을 감은 탐사선의 1인칭 시선으로 마주하는 지연된 시공간의 고독과 서사. 빛조차 하루가 걸려 도착하는 우주적 침묵을 4K UHD와 천체투영관 돔 스크린 영상으로 구현했습니다.
+            </p>
+          </div>
+
+          <div class="intro-actions">
+            <button id="startIntroBtn" type="button" class="btn-start-4k">▶ 4K 감상 시작 (3분 45초)</button>
+            <button id="toggleDomeIntroBtn" type="button" class="btn-intro-dome">돔 스크린 180° 모드 전환</button>
+          </div>
+
+          <div class="intro-specs">
+            <span>화질: 4K UHD (3840×2160)</span>
+            <span>길이: 225초 (3분 45초)</span>
+            <span>음향: 48kHz 스테레오</span>
+            <span>형식: MP4</span>
+          </div>
+        </div>
+      </section>
 
       <header class="masthead">
-        <p class="eyebrow">VOYAGER 1 PERSPECTIVE · FULLDOME &amp; CINEMATIC · 210 S (3M 30S) · 6,300 FRAMES</p>
+        <p class="eyebrow">VOYAGER 1 PERSPECTIVE · 4K UHD &amp; FULLDOME · 225 S (3M 45S) · MP4</p>
         <h1 id="title">VOYAGER 1 <span>—</span> LIGHT DAY GAP</h1>
         <p class="subtitle">하루 늦게 도착하는 우리 (보이저 1호의 시선)</p>
       </header>
 
       <section class="readout" aria-live="polite">
-        <p id="sceneId" class="readout-id">S01</p>
-        <h2 id="sceneTitle">어둠 속의 신호</h2>
-        <p id="sceneMeta">259억 km 심연 · 가상 수신 사건</p>
+        <p id="sceneId" class="readout-id">S00</p>
+        <h2 id="sceneTitle">프롤로그 · 하루의 틈</h2>
+        <p id="sceneMeta">작품 개요 · 보이저 1호의 시선 · 4K UHD</p>
       </section>
 
       <section class="science-note" aria-label="데이터 상태">
         <span class="status-dot connected" aria-hidden="true"></span>
-        <p><strong>보이저 1호 가상 시점 연동</strong><br>NASA JPL Horizons 궤도역학 벡터 역산</p>
+        <p><strong>4K UHD / MP4 렌더링 준비됨</strong><br>NASA JPL Horizons 궤도역학 벡터 연동</p>
       </section>
 
       <section class="caption" aria-live="polite">
-        <p id="captionText">칠흑의 우주에서, 어제의 지구가 보낸 신호가 내게 닿았다.</p>
-        <p id="simpleHudText" class="simple-hud">지구와의 거리: 1광일 (259억 km) · 신호 지연: 약 24시간</p>
+        <p id="captionText">우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.</p>
+        <p id="simpleHudText" class="simple-hud">VOYAGER 1 — LIGHT DAY GAP · 4K UHD · FORMAT MP4</p>
       </section>
 
       <footer class="control-dock">
         <div class="transport" aria-label="미리보기 제어">
+          <button id="introViewBtn" type="button" class="btn-intro" title="작품 설명 시작 화면 열기">시작 화면</button>
           <button id="playButton" type="button" aria-pressed="false">일시정지</button>
           <button id="muteButton" type="button" aria-pressed="false">소리 켜기</button>
           <button id="domeButton" type="button" class="btn-dome" aria-pressed="false">돔 스크린 180° OFF</button>
           <div class="record-group">
-            <button id="recordButton" type="button" class="btn-record" aria-pressed="false" title="화면을 비디오 파일로 직접 녹화합니다">● 녹화 시작</button>
+            <button id="recordButton" type="button" class="btn-record" aria-pressed="false" title="4K MP4 비디오 파일로 직접 녹화합니다">● 4K 녹화</button>
             <select id="recordModeSelect" class="record-select" title="녹화 모드 선택">
-              <option value="full">전체 3분 30초 자동 녹화</option>
+              <option value="full">전체 3분 45초 자동 녹화</option>
               <option value="manual">현재 구간 자유 녹화</option>
             </select>
+            <select id="recordFormatSelect" class="record-format-select" title="녹화 파일 형식">
+              <option value="mp4">형식: MP4</option>
+              <option value="webm">형식: WebM</option>
+            </select>
           </div>
-          <button id="explainButton" type="button" class="btn-explain" aria-haspopup="dialog" aria-expanded="false">📖 작품 및 연출 설명</button>
+          <button id="explainButton" type="button" class="btn-explain" aria-haspopup="dialog" aria-expanded="false">📖 상세 설명서</button>
           <button id="essayButton" type="button" aria-haspopup="dialog" aria-expanded="false">비평 전문</button>
-          <span id="clock" class="clock">00:00 / 03:30</span>
+          <span id="clock" class="clock">00:00 / 03:45</span>
         </div>
 
         <label class="scrubber-label" for="timeline">장면 타임라인</label>
-        <input id="timeline" type="range" min="0" max="210" value="0" step="0.01">
+        <input id="timeline" type="range" min="0" max="225" value="0" step="0.01">
         <div id="chapterMarkers" class="chapter-markers" aria-label="장면 바로가기"></div>
       </footer>
 
@@ -66,7 +106,7 @@
             <div>
               <p class="eyebrow">STORY &amp; FULLDOME DIRECTING GUIDE</p>
               <h2 id="explainTitle">작품 및 연출 설명서</h2>
-              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (보이저 1호의 시선)</p>
+              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (4K UHD · MP4)</p>
             </div>
             <button id="closeExplainButton" class="close-btn" type="button" aria-label="설명 닫기">✕</button>
           </header>
@@ -77,40 +117,32 @@
               우리는 같은 우주에 있지만 결코 같은 현재를 공유할 수 없다.”
             </blockquote>
 
-            <h3>1. 보이저 1호 1인칭 시점 서사</h3>
+            <h3>1. 화질 4K UHD 및 형식 MP4 규격</h3>
             <p>
-              본 작품은 관찰자의 3인칭 과학 해설을 탈피하여, 1977년 지구를 떠난 탐사선 <strong>보이저 1호(Voyager 1)의 내면 독백과 가상 시선</strong>으로 시청각적 스토리텔링을 전개합니다.
+              본 프로젝트는 초고해상도 <strong>4K UHD (3840×2160)</strong> 및 천체투영관 4K Fulldome Domemaster (3840×3840) 규격으로 렌더링되며, <strong>H.264 / AAC 48kHz 기반의 범용 MP4 형식</strong>을 기본 출력 포맷으로 채택했습니다.
+            </p>
+
+            <h3>2. 시작 화면 (Prologue Intro Card)과 1인칭 서사</h3>
+            <p>
+              영상 시작부(S00: 00:00~00:15)에 타이틀 카드와 핵심 작품 설명이 시네마틱하게 배치되어 관객이 작품의 세계관과 과학적 배경을 즉시 이해할 수 있도록 설계되었습니다.
             </p>
             <ul>
-              <li><strong>S01 어둠 속의 신호 (00:00~00:15):</strong> 259억 km 밖에서 24시간 전 어제의 지구가 보낸 신호를 수신하는 순간.</li>
-              <li><strong>S02 떠나온 49년의 궤적 (00:15~00:45):</strong> 목성과 토성의 중력도움을 받아 태양권을 넘어 성간 공간으로 진입한 49년간의 항로.</li>
-              <li><strong>S03 마지막으로 본 집 (00:45~01:10):</strong> 1990년 칼 세이건의 제안으로 촬영된 '창백한 푸른 점' 이후 영구 정지된 카메라의 시선(0.1015초각의 미세한 점).</li>
-              <li><strong>S04 1광일의 심연 (01:10~01:45):</strong> 빛조차 하루가 걸리는 259억 km(173.1 AU)의 시공간적 간극.</li>
-              <li><strong>S05 두 장소의 하루 (01:45~02:15):</strong> 보이저가 147만 km 나아가는 동안, 지구는 태양 주위를 257만 km 공전하는 서로 다른 하루.</li>
-              <li><strong>S06 엇갈리는 시계 (02:15~02:40):</strong> 특수상대론적 속도 지연(하루 139 μs)으로 인해 지구 시계와 보이저 시계의 미세한 분열.</li>
-              <li><strong>S07 성간의 떨림 (02:40~03:00):</strong> 눈은 감겼지만 PWS 안테나를 울리는 성간 플라스마 진동(2.2~3.0 kHz)의 소리화.</li>
-              <li><strong>S08 원자의 심박수 (03:00~03:18):</strong> RTG 플루토늄-238 붕괴열로 20와트 미약한 전파를 생성해 지구로 띄우는 지속적 미열.</li>
-              <li><strong>S09 내일로 보내는 응답 (03:18~03:30):</strong> “내가 보낸 오늘이 내일의 당신들에게 닿기를. 안녕, 나의 지구.”</li>
+              <li><strong>S00 프롤로그 · 하루의 틈 (00:00~00:15):</strong> 시작 화면 및 작품 설명 타이틀 카드 (4K UHD / MP4).</li>
+              <li><strong>S01 어둠 속의 신호 (00:15~00:30):</strong> 259억 km 밖에서 24시간 전 어제의 지구가 보낸 신호를 수신하는 순간.</li>
+              <li><strong>S02 떠나온 49년의 궤적 (00:30~01:00):</strong> 목성과 토성의 중력도움을 받아 태양권을 넘어 성간 공간으로 진입한 49년간의 항로.</li>
+              <li><strong>S03 마지막으로 본 집 (01:00~01:25):</strong> 1990년 칼 세이건의 제안으로 촬영된 '창백한 푸른 점' 이후 영구 정지된 카메라의 시선(0.1015초각의 미세한 점).</li>
+              <li><strong>S04 1광일의 심연 (01:25~02:00):</strong> 빛조차 하루가 걸리는 259억 km(173.1 AU)의 시공간적 간극.</li>
+              <li><strong>S05 두 장소의 하루 (02:00~02:30):</strong> 보이저가 147만 km 나아가는 동안, 지구는 태양 주위를 257만 km 공전하는 서로 다른 하루.</li>
+              <li><strong>S06 엇갈리는 시계 (02:30~02:55):</strong> 특수상대론적 속도 지연(하루 139 μs)으로 인해 지구 시계와 보이저 시계의 미세한 분열.</li>
+              <li><strong>S07 성간의 떨림 (02:55~03:15):</strong> 눈은 감겼지만 PWS 안테나를 울리는 성간 플라스마 진동(2.2~3.0 kHz)의 소리화.</li>
+              <li><strong>S08 원자의 심박수 (03:15~03:32):</strong> RTG 플루토늄-238 붕괴열로 20와트 미약한 전파를 생성해 지구로 띄우는 지속적 미열.</li>
+              <li><strong>S09 내일로 보내는 응답 (03:32~03:45):</strong> “내가 보낸 오늘이 내일의 당신들에게 닿기를. 안녕, 나의 지구.”</li>
             </ul>
 
-            <h3>2. 천체투영관 돔 스크린(Fulldome 180°) 연출 설계</h3>
+            <h3>3. 천체투영관 돔 스크린(Fulldome 180°) 연출 설계</h3>
             <p>
-              하단의 <strong>[돔 스크린 180°]</strong> 토글 버튼을 켜면 전 세계 천체투영관 및 돔 극장의 표준 규격인 <strong>1:1 원형 어안 돔마스터(Circular Fisheye Domemaster)</strong> 투영 모드가 활성화됩니다:
+              하단의 <strong>[돔 스크린 180°]</strong> 토글 버튼을 켜면 전 세계 천체투영관 표준 규격인 <strong>1:1 원형 어안 돔마스터(Circular Fisheye Domemaster)</strong> 투영 모드가 활성화됩니다.
             </p>
-            <ul>
-              <li><strong>천정(Zenith) 중심 투영:</strong> 화면 정중앙이 관객의 머리 바로 위 천정(고도 90°)에 위치하며, 외곽 원형 림이 지평선(Horizon, 고도 0°)에 대응합니다.</li>
-              <li><strong>방위각/고도 그리드 가이드:</strong> 30도, 60도 고도 동심원과 동서남북(E, W, S, N) 방위각 십자선이 돔 곡면에 완벽히 정렬됩니다.</li>
-              <li><strong>주변부 왜곡 방지 및 안전 영역(Dome Safe Area):</strong> 시각적 핵심 정보와 자막을 돔 하단 림에 묻히지 않도록 고도 35°~65° 사이의 스위트 스팟에 배치했습니다.</li>
-            </ul>
-
-            <h3>3. 브라우저 실시간 녹화 기능 안내</h3>
-            <p>
-              하단의 <strong>[● 녹화 시작]</strong> 버튼을 누르면 Canvas 스트림과 합성 사운드를 직접 캡처하여 브라우저에서 즉시 WebM/MP4 비디오 파일로 다운로드할 수 있습니다:
-            </p>
-            <ul>
-              <li><strong>전체 3분 30초 자동 녹화:</strong> 시작점(00:00)부터 210초 끝까지 재생되며 영상 완성 시 자동으로 파일이 다운로드됩니다.</li>
-              <li><strong>현재 구간 자유 녹화:</strong> 원하는 시점부터 녹화를 시작하고 [녹화 중지] 버튼을 눌러 언제든지 저장할 수 있습니다.</li>
-            </ul>
           </div>
         </div>
       </aside>
@@ -122,7 +154,7 @@
             <div>
               <p class="eyebrow">CURATORIAL ESSAY &amp; CRITICAL REVIEW</p>
               <h2 id="essayTitle">빛의 하루, 지연된 존재론 (보이저 1호의 시선)</h2>
-              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (하루 늦게 도착하는 우리)</p>
+              <p class="essay-subtitle">VOYAGER 1 — LIGHT DAY GAP (4K UHD · MP4)</p>
             </div>
             <button id="closeEssayButton" class="close-btn" type="button" aria-label="해설 닫기">✕</button>
           </header>
@@ -138,23 +170,7 @@
               본 작품은 2026년 11월 18일, 인류가 우주로 쏘아 올린 가장 먼 사물이자 최초의 성간 탐사선인 <strong>보이저 1호(Voyager 1)</strong>가 지구로부터 <strong>정확히 1광일(Light-Day, 약 259억 km)</strong> 떨어진 지점을 통과하는 순간을 다룹니다.
             </p>
             <p>
-              천체투영관 돔 스크린(Fulldome) 화면 전체를 180도 반구형 심연으로 전환하여, 관객이 객석에 누워 천정을 바라볼 때 스스로가 성간 공간에 홀로 떠 있는 보이저 1호의 동체와 시선이 되도록 연출했습니다. 복잡한 수치와 설명문단을 걷어내고, 영화적이고 시적인 1인칭 독백과 직관적인 핵심 정보만으로 우주적 시공간의 어긋남을 감각하도록 각색되었습니다.
-            </p>
-
-            <h3>2. 꺼진 눈과 기억 속의 창백한 푸른 점</h3>
-            <p>
-              1990년 2월 14일, 보이저 1호는 인류 역사상 가장 고귀한 가족사진이자 ‘창백한 푸른 점(Pale Blue Dot)’을 촬영한 직후 카메라의 전원을 영구히 차단했습니다. 따라서 1광일 거리에서 보이저가 마주하는 지구의 모습은 실사 이미지가 아니라, 궤도역학과 빛의 지연 방정식을 역산하여 구축한 <strong>‘계산된 가상의 시선’</strong>입니다.
-            </p>
-            <p>
-              이 거리에서 지구의 시직경은 0.1015초각에 불과한 극미세 점광원입니다. 화려한 시각적 과장을 걷어내고 남은 이 침묵의 점광원은, 광대한 우주 속에서 우리가 기원한 고향의 덧없음과 아름다움을 증언합니다.
-            </p>
-
-            <h3>3. 원자의 맥박: 어제의 당신들에게 띄우는 오늘의 안부</h3>
-            <p>
-              영하 200도를 밑도는 성간의 암흑 속에서 20와트 남짓의 미약한 전파를 지구로 쏘아 올리는 힘은, 탐사선 심장에 실린 <strong>플루토늄-238(Pu-238) 원자핵의 미세한 붕괴열</strong>입니다.
-            </p>
-            <p>
-              우리는 같은 우주에 존재하지만, 서로의 ‘현재’를 결코 동시에 공유할 수 없습니다. 보이저가 보낸 신호가 지구에 닿을 때, 그곳의 우리는 이미 하루를 더 살아낸 뒤입니다. 이 작품은 타자와의 연결이란 상대방의 현재를 소유하는 것이 아니라, 그가 지나온 어제의 흔적을 경청하고 침묵을 품어 안는 일임을 보여줍니다.
+              천체투영관 돔 스크린(Fulldome) 화면 전체를 180도 반구형 심연으로 전환하여, 관객이 객석에 누워 천정을 바라볼 때 스스로가 성간 공간에 홀로 떠 있는 보이저 1호의 동체와 시선이 되도록 연출했습니다. 4K UHD 해상도와 MP4 포맷으로 직관적이고 시적인 우주적 시공간의 어긋남을 감각하게 합니다.
             </p>
           </div>
         </div>

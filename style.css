@@ -42,20 +42,151 @@ h1 span { color: var(--gold); font-weight: 400; }
 .transport button.btn-record { background: transparent; border: none; color: #ff6e6e; font-weight: 500; padding: .34rem .65rem; border-radius: 99px; }
 .transport button.btn-record:hover { background: rgba(255, 90, 90, 0.15); outline: none; }
 .transport button.btn-record.recording { background: rgba(255, 60, 60, 0.28); color: #ff4d4d; box-shadow: 0 0 14px rgba(255, 60, 60, 0.6); animation: recordPulse 1.2s infinite ease-in-out; }
-.record-select { background: rgba(4, 12, 22, 0.85); border: none; border-left: 1px solid rgba(104, 216, 232, 0.2); color: var(--muted); cursor: pointer; font-size: 0.68rem; padding: 0.32rem 0.5rem; border-radius: 0 99px 99px 0; outline: none; }
-.record-select:focus { color: var(--ink); }
+.record-select, .record-format-select { background: rgba(4, 12, 22, 0.85); border: none; border-left: 1px solid rgba(104, 216, 232, 0.2); color: var(--muted); cursor: pointer; font-size: 0.68rem; padding: 0.32rem 0.5rem; outline: none; }
+.record-format-select { border-radius: 0 99px 99px 0; color: var(--gold); }
+.record-select:focus, .record-format-select:focus { color: var(--ink); }
+.transport button.btn-intro { background: rgba(104, 216, 232, 0.15); border-color: var(--cyan); color: var(--cyan); font-weight: 500; }
+.transport button.btn-intro:hover { background: rgba(104, 216, 232, 0.3); }
 .transport button.btn-explain { background: rgba(216, 183, 120, 0.12); border-color: rgba(216, 183, 120, 0.4); color: var(--gold); }
 .transport button.btn-explain:hover { background: rgba(216, 183, 120, 0.25); outline: 2px solid var(--gold); }
 @keyframes recordPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.82; transform: scale(0.97); } }
 .clock { color: var(--muted); margin-left: auto; }
 .scrubber-label { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
 #timeline { accent-color: var(--cyan); cursor: pointer; display: block; height: 1rem; margin: 0; width: 100%; }
-.chapter-markers { display: grid; gap: .35rem; grid-template-columns: repeat(9, 1fr); margin-top: .5rem; }
+.chapter-markers { display: grid; gap: .35rem; grid-template-columns: repeat(10, 1fr); margin-top: .5rem; }
 .chapter-marker { background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--muted); cursor: pointer; font-family: "DM Mono", ui-monospace, monospace; font-size: clamp(.5rem, .65vw, .65rem); overflow: hidden; padding: .36rem 0 0; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .chapter-marker:hover, .chapter-marker:focus-visible, .chapter-marker.active { border-top-color: var(--gold); color: var(--gold); outline: none; }
-@media (max-width: 850px) { .record-select { display: none; } .record-group { border: none; background: none; } }
+@media (max-width: 900px) { .record-select, .record-format-select { display: none; } .record-group { border: none; background: none; } }
 @media (max-width: 650px) { .science-note { display: none; } .readout { bottom: 8.4rem; max-width: 74vw; } .caption { bottom: 5.5rem; } .chapter-marker { font-size: .5rem; } .transport button { padding: .34rem .55rem; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+
+/* Starting Screen Overlay with Artwork Description (시작 화면) */
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: radial-gradient(circle at center, rgba(8, 18, 30, 0.88), rgba(2, 4, 8, 0.96));
+  backdrop-filter: blur(20px);
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+}
+
+.intro-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-card {
+  width: min(54rem, 92vw);
+  background: rgba(5, 12, 24, 0.88);
+  border: 1px solid rgba(104, 216, 232, 0.35);
+  border-radius: 14px;
+  padding: clamp(1.6rem, 3.5vw, 2.8rem);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(104, 216, 232, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.intro-title {
+  font-size: clamp(1.4rem, 2.8vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.intro-title span {
+  color: var(--gold);
+}
+
+.intro-subtitle {
+  color: var(--gold);
+  font-size: clamp(.95rem, 1.4vw, 1.25rem);
+  margin: -0.5rem 0 0;
+}
+
+.intro-quote {
+  border-left: 3px solid var(--cyan);
+  padding: 0.75rem 1.1rem;
+  background: rgba(104, 216, 232, 0.06);
+  font-style: italic;
+  color: var(--ink);
+  font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+  line-height: 1.6;
+}
+
+.intro-description {
+  color: var(--muted);
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  line-height: 1.7;
+}
+
+.intro-description strong {
+  color: var(--ink);
+}
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.btn-start-4k {
+  background: linear-gradient(135deg, rgba(104, 216, 232, 0.3), rgba(104, 216, 232, 0.12));
+  border: 1px solid var(--cyan);
+  border-radius: 99px;
+  color: #fff;
+  cursor: pointer;
+  font-size: clamp(0.88rem, 1.1vw, 1.05rem);
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  box-shadow: 0 0 20px rgba(104, 216, 232, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-start-4k:hover {
+  background: var(--cyan);
+  color: #03060b;
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(104, 216, 232, 0.6);
+}
+
+.btn-intro-dome {
+  background: rgba(216, 183, 120, 0.12);
+  border: 1px solid var(--gold);
+  border-radius: 99px;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  padding: 0.7rem 1.3rem;
+  transition: all 0.25s ease;
+}
+
+.btn-intro-dome:hover {
+  background: rgba(216, 183, 120, 0.25);
+  transform: translateY(-2px);
+}
+
+.intro-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 0.4rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(160, 203, 217, 0.16);
+  font-family: "DM Mono", monospace;
+  font-size: clamp(0.68rem, 0.82vw, 0.78rem);
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
 
 /* Curatorial Essay Modal & Reader */
 .essay-modal {

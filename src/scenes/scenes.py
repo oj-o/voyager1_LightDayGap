@@ -197,6 +197,9 @@ class SceneRenderer:
         f_caption = font_mgr.get_font(int(self.h * 0.025), bold=True)
 
         # Safe margins depending on dome mode
+        if state.get("scene_id") == "S00":
+            return  # S00 prologue renders its own complete intro title & artwork description card
+
         if self.dome_mode:
             # Inside safe sweet spot of dome (around altitude 45-60)
             top_y = int(self.dome_cy - self.dome_radius * 0.72)
@@ -231,7 +234,61 @@ class SceneRenderer:
             draw.text((hx, hud_y), simple_hud, font=f_hud, fill=COLORS["voyager_gold"])
 
     # -------------------------------------------------------------
-    # S01: 어둠 속의 신호 (00:00 - 00:15)
+    # S00: 프롤로그 · 작품 설명 (00:00 - 00:15)
+    # -------------------------------------------------------------
+    def render_s00(self, draw: ImageDraw.ImageDraw, state: Dict[str, Any]):
+        u = state["local_progress"]
+        cx = self.w * 0.5
+        cy = self.h * 0.46
+
+        # Fading curve for smooth entrance and transition
+        fade = min(1.0, max(0.0, math.sin(u * math.pi))) if u < 0.9 else (1.0 - u) / 0.1
+
+        # Typography
+        f_main_title = font_mgr.get_font(int(self.h * 0.038), bold=True)
+        f_main_sub = font_mgr.get_font(int(self.h * 0.022), bold=False)
+        f_quote = font_mgr.get_font(int(self.h * 0.019), bold=True)
+        f_desc = font_mgr.get_font(int(self.h * 0.016), bold=False)
+        f_badge = font_mgr.get_font(int(self.h * 0.013), bold=True)
+
+        # Title
+        t1 = "VOYAGER 1 — LIGHT DAY GAP"
+        b1 = draw.textbbox((0, 0), t1, font=f_main_title)
+        draw.text((cx - (b1[2] - b1[0]) // 2, cy - self.h * 0.22), t1, font=f_main_title, fill=COLORS["white"])
+
+        # Subtitle
+        t2 = "하루 늦게 도착하는 우리 (보이저 1호의 시선)"
+        b2 = draw.textbbox((0, 0), t2, font=f_main_sub)
+        draw.text((cx - (b2[2] - b2[0]) // 2, cy - self.h * 0.155), t2, font=f_main_sub, fill=COLORS["voyager_gold"])
+
+        # Card Box with Artwork Description
+        card_w = int(min(self.w, self.h) * 0.78) if self.dome_mode else int(self.w * 0.62)
+        card_h = int(self.h * 0.26)
+        card_x = int(cx - card_w * 0.5)
+        card_y = int(cy - self.h * 0.08)
+
+        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=8, fill=COLORS["panel_bg"], outline=COLORS["panel_border"], width=1)
+
+        # Curatorial text lines
+        q_text = "“우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.”"
+        bq = draw.textbbox((0, 0), q_text, font=f_quote)
+        draw.text((cx - (bq[2] - bq[0]) // 2, card_y + int(card_h * 0.18)), q_text, font=f_quote, fill=COLORS["earth_cyan"])
+
+        d1 = "1977년 지구를 떠난 보이저 1호는 2026년 11월 18일, 지구로부터 1광일(259억 km)의 지점을 통과한다."
+        bd1 = draw.textbbox((0, 0), d1, font=f_desc)
+        draw.text((cx - (bd1[2] - bd1[0]) // 2, card_y + int(card_h * 0.44)), d1, font=f_desc, fill=COLORS["white"])
+
+        d2 = "1990년 '창백한 푸른 점'을 끝으로 눈을 감은 탐사선의 시선으로 바라본 지연된 시공간의 서사."
+        bd2 = draw.textbbox((0, 0), d2, font=f_desc)
+        draw.text((cx - (bd2[2] - bd2[0]) // 2, card_y + int(card_h * 0.68)), d2, font=f_desc, fill=COLORS["muted"])
+
+        # Technical Format Badge
+        badge_txt = "화질 4K UHD (3840×2160)  ·  천체투영관 FULLDOME  ·  형식 MP4"
+        bb = draw.textbbox((0, 0), badge_txt, font=f_badge)
+        draw.text((cx - (bb[2] - bb[0]) // 2, card_y + card_h + int(self.h * 0.05)), badge_txt, font=f_badge, fill=COLORS["voyager_gold"])
+
+    # -------------------------------------------------------------
+    # S01: 어둠 속의 신호 (00:15 - 00:30)
     # -------------------------------------------------------------
     def render_s01(self, draw: ImageDraw.ImageDraw, state: Dict[str, Any]):
         u = state["local_progress"]
@@ -548,6 +605,7 @@ class SceneRenderer:
         # Render specific scene
         idx = state["scene_index"]
         scene_funcs = [
+            self.render_s00,
             self.render_s01,
             self.render_s02,
             self.render_s03,

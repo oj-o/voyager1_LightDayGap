@@ -14,9 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const domeButton = document.querySelector("#domeButton");
   const recordButton = document.querySelector("#recordButton");
   const recordModeSelect = document.querySelector("#recordModeSelect");
+  const recordFormatSelect = document.querySelector("#recordFormatSelect");
   const explainButton = document.querySelector("#explainButton");
   const explainModal = document.querySelector("#explainModal");
   const closeExplainButton = document.querySelector("#closeExplainButton");
+  const introScreen = document.querySelector("#introScreen");
+  const startIntroBtn = document.querySelector("#startIntroBtn");
+  const toggleDomeIntroBtn = document.querySelector("#toggleDomeIntroBtn");
+  const introViewBtn = document.querySelector("#introViewBtn");
   const essayButton = document.querySelector("#essayButton");
   const essayModal = document.querySelector("#essayModal");
   const closeEssayButton = document.querySelector("#closeEssayButton");
@@ -28,9 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const simpleHudText = document.querySelector("#simpleHudText");
   const chapterMarkers = document.querySelector("#chapterMarkers");
 
-  const DURATION_S = 210; // 3 minutes 30 seconds
+  const DURATION_S = 225; // 3 minutes 45 seconds
   const FPS = 30;
-  const LAST_FRAME_S = 6299 / FPS;
+  const LAST_FRAME_S = 6749 / FPS;
   const COLORS = {
     background: "#03060b",
     cyan: "#68d8e8",
@@ -44,9 +49,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const SCENES = [
     {
-      id: "S01",
+      id: "S00",
       start: 0,
       end: 15,
+      title: "프롤로그 · 하루의 틈",
+      meta: "시작 화면 · 작품 개요 · 4K UHD",
+      caption: "우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.",
+      hud: "VOYAGER 1 — LIGHT DAY GAP · 4K UHD · FORMAT MP4"
+    },
+    {
+      id: "S01",
+      start: 15,
+      end: 30,
       title: "어둠 속의 신호",
       meta: "259억 km 심연 · 가상 수신 사건",
       caption: "칠흑의 우주에서, 어제의 지구가 보낸 신호가 내게 닿았다.",
@@ -54,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S02",
-      start: 15,
-      end: 45,
+      start: 30,
+      end: 60,
       title: "떠나온 49년의 궤적",
       meta: "1977 발사 → 목성·토성 → 태양계 탈출",
       caption: "행성들의 중력을 딛고, 나는 태양의 품을 벗어났다.",
@@ -63,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S03",
-      start: 45,
-      end: 70,
+      start: 60,
+      end: 85,
       title: "마지막으로 본 집",
       meta: "1990 창백한 푸른 점 이후 카메라 영구 정지",
       caption: "1990년, 마지막으로 집을 뒤돌아본 뒤 나의 눈은 영원히 감겼다.",
@@ -72,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S04",
-      start: 70,
-      end: 105,
+      start: 85,
+      end: 120,
       title: "1광일의 심연",
       meta: "빛으로 하루 걸리는 거리 · 259억 km",
       caption: "빛조차 하루가 걸리는 거리. 내가 보는 것은 언제나 어제의 당신들.",
@@ -81,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S05",
-      start: 105,
-      end: 135,
+      start: 120,
+      end: 150,
       title: "두 장소의 하루",
       meta: "보이저의 하루 147만 km · 지구의 하루 257만 km",
       caption: "내가 고요히 성간을 가르는 동안, 지구는 맹렬히 태양을 돈다.",
@@ -90,8 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S06",
-      start: 135,
-      end: 160,
+      start: 150,
+      end: 175,
       title: "엇갈리는 시계",
       meta: "상대론적 시공간 · 흐르는 시간의 차이",
       caption: "거리의 지연 너머, 나의 시계와 지구의 시계도 서로 어긋난다.",
@@ -99,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S07",
-      start: 160,
-      end: 180,
+      start: 175,
+      end: 195,
       title: "성간의 떨림",
       meta: "플라스마파(PWS) 관측 · 눈을 감은 뒤의 귀",
       caption: "눈은 감겼지만, 성간 플라스마의 떨림이 내 몸을 울린다.",
@@ -108,8 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S08",
-      start: 180,
-      end: 198,
+      start: 195,
+      end: 212,
       title: "원자의 심박수",
       meta: "RTG 플루토늄-238 붕괴열 · 미세한 생명선",
       caption: "심장에 품은 원자들의 온기로, 나는 마지막 신호를 띄운다.",
@@ -117,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "S09",
-      start: 198,
-      end: 210,
+      start: 212,
+      end: 225,
       title: "내일로 보내는 응답",
       meta: "보이저 가상 시선 · 어제의 지구를 향하여",
       caption: "안녕, 나의 지구. 지금 여기 도착한 것은 어제의 당신들.",
@@ -272,7 +286,38 @@ document.addEventListener("DOMContentLoaded", () => {
     if (label) drawText(label, mix(x1, x2, .5), mix(y1, y2, .5) - 12, { align: "center", color, size: 10, family: "mono" });
   }
 
-  // --- SCENE 1: 어둠 속의 신호 (0 - 15s) ---
+  // --- SCENE 0: 프롤로그 · 작품 설명 (0 - 15s) ---
+  function scenePrologue(t) {
+    const cx = width * .5;
+    const cy = height * .46;
+    const fade = clamp(Math.sin(t * Math.PI));
+
+    drawText("VOYAGER 1 — LIGHT DAY GAP", cx, cy - 84, { align: "center", color: COLORS.white, size: Math.min(width * 0.038, 36), weight: 700 });
+    drawText("하루 늦게 도착하는 우리 (보이저 1호의 시선)", cx, cy - 44, { align: "center", color: COLORS.gold, size: Math.min(width * 0.02, 19) });
+
+    const cardW = Math.min(width * 0.78, 680);
+    const cardH = 145;
+    const x = cx - cardW * .5;
+    const y = cy - 18;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(4, 12, 22, .88)";
+    ctx.strokeStyle = "rgba(104, 216, 232, .35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(x, y, cardW, cardH, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    drawText("“우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.”", cx, y + 36, { align: "center", color: COLORS.cyan, size: 14, weight: 600 });
+    drawText("1977년 지구를 떠난 보이저 1호는 2026년 11월 18일, 지구로부터 1광일(259억 km)의 지점을 통과한다.", cx, y + 72, { align: "center", color: COLORS.white, size: 12 });
+    drawText("1990년 '창백한 푸른 점'을 끝으로 눈을 감은 탐사선의 시선으로 바라본 지연된 시공간의 서사.", cx, y + 102, { align: "center", color: COLORS.muted, size: 11 });
+
+    drawText("화질 4K UHD (3840×2160)  ·  천체투영관 FULLDOME  ·  형식 MP4", cx, y + cardH + 28, { align: "center", color: COLORS.gold, size: 11, family: "mono" });
+  }
+
+  // --- SCENE 1: 어둠 속의 신호 (15 - 30s) ---
   function sceneArrival(t) {
     const cx = width * .5; const cy = height * .48;
     const voyagerX = cx + 180; const voyagerY = cy + 15;
@@ -450,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderScene(index, time) {
     const t = localTime(SCENES[index], time);
-    [sceneArrival, sceneTrajectory, scenePaleBlueDot, sceneGap, sceneDay, sceneClocks, sceneSensors, sceneRtg, sceneFinal][index](t);
+    [scenePrologue, sceneArrival, sceneTrajectory, scenePaleBlueDot, sceneGap, sceneDay, sceneClocks, sceneSensors, sceneRtg, sceneFinal][index](t);
   }
 
   function drawDomeOverlay() {
@@ -513,11 +558,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateAudio(index) {
     if (!audio || !soundOn) return;
     const now = audio.context.currentTime;
-    const root = [52, 58, 49, 55, 62, 47, 66, 43, 52][index];
+    const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
     audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
     audio.lowGain.gain.setTargetAtTime(.055, now, .35);
-    audio.highGain.gain.setTargetAtTime(index === 6 ? .022 : .011, now, .35);
+    audio.highGain.gain.setTargetAtTime(index === 7 ? .022 : .011, now, .35);
   }
 
   function toggleSound() {
@@ -568,13 +613,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    let mimeType = "video/webm;codecs=vp9";
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = MediaRecorder.isTypeSupported("video/webm") ? "video/webm" : "video/mp4";
+    const selectedFormat = recordFormatSelect ? recordFormatSelect.value : "mp4";
+    let mimeType = "video/webm";
+    let ext = "webm";
+
+    if (selectedFormat === "mp4") {
+      const candidates = ["video/mp4;codecs=avc1", "video/mp4;codecs=h264", "video/mp4"];
+      for (const cand of candidates) {
+        if (MediaRecorder.isTypeSupported(cand)) {
+          mimeType = cand;
+          ext = "mp4";
+          break;
+        }
+      }
+      if (ext !== "mp4") {
+        mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+        ext = "mp4";
+      }
+    } else {
+      mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+      ext = "webm";
     }
 
     try {
-      mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 6000000 });
+      mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 16000000 });
     } catch (err) {
       mediaRecorder = new MediaRecorder(stream);
     }
@@ -586,14 +648,14 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || "video/webm" });
+      const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || (ext === "mp4" ? "video/mp4" : "video/webm") });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
       const isDomeStr = isDomeMode ? "Fulldome" : "Wide";
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      a.download = `Voyager1_LightDayGap_${isDomeStr}_${timestamp}.webm`;
+      a.download = `Voyager1_LightDayGap_4K_${isDomeStr}_${timestamp}.${ext}`;
       document.body.appendChild(a);
       a.click();
       setTimeout(() => {
@@ -604,7 +666,7 @@ document.addEventListener("DOMContentLoaded", () => {
       isRecording = false;
       recordButton.classList.remove("recording");
       recordButton.setAttribute("aria-pressed", "false");
-      recordButton.textContent = "● 녹화 시작";
+      recordButton.textContent = "● 4K 녹화";
     };
 
     mediaRecorder.start(1000); // 1-second chunks
@@ -633,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setSceneReadout(index);
     timeline.value = String(filmTime);
     const recIndicator = isRecording ? " [REC]" : "";
-    clock.textContent = `${formatClock(filmTime)} / 03:30${recIndicator}`;
+    clock.textContent = `${formatClock(filmTime)} / 03:45${recIndicator}`;
     playButton.textContent = playing ? "일시정지" : "재생";
     playButton.setAttribute("aria-pressed", String(playing));
   }
@@ -669,6 +731,30 @@ document.addEventListener("DOMContentLoaded", () => {
   if (recordButton) recordButton.addEventListener("click", toggleRecording);
   timeline.addEventListener("input", () => { filmTime = Number(timeline.value); playing = false; syncTransport(); });
 
+  // Starting Screen (Intro Overlay) Listeners
+  if (startIntroBtn && introScreen) {
+    startIntroBtn.addEventListener("click", () => {
+      introScreen.classList.add("hidden");
+      filmTime = 0;
+      playing = true;
+      syncTransport();
+    });
+  }
+  if (toggleDomeIntroBtn) {
+    toggleDomeIntroBtn.addEventListener("click", () => {
+      toggleDomeMode();
+      toggleDomeIntroBtn.textContent = isDomeMode ? "돔 스크린 180° 모드 켜짐 ✓" : "돔 스크린 180° 모드로 감상";
+    });
+  }
+  if (introViewBtn && introScreen) {
+    introViewBtn.addEventListener("click", () => {
+      introScreen.classList.remove("hidden");
+      playing = false;
+      filmTime = 0;
+      syncTransport();
+    });
+  }
+
   // Explain Guide Modal
   if (explainButton && explainModal) {
     explainButton.addEventListener("click", () => {
@@ -701,6 +787,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement) return;
     if (event.code === "Space") { event.preventDefault(); playButton.click(); }
     if (event.code === "Escape") {
+      if (introScreen && !introScreen.classList.contains("hidden")) { introScreen.classList.add("hidden"); }
       if (explainModal) { explainModal.classList.remove("open"); explainModal.setAttribute("aria-hidden", "true"); }
       if (essayModal) { essayModal.classList.remove("open"); essayModal.setAttribute("aria-hidden", "true"); }
     }
