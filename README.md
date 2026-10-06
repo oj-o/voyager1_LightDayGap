@@ -6,7 +6,8 @@
 
 보이저 1호(Voyager 1)와 지구 사이의 1광일(1 Light-Day, 약 259억 km) 광행시간 간극과 2026년 11월 18일 통과 사건을 다루는 **4K UHD 천체투영관 돔 스크린(Fulldome 180°) 및 시네마틱 미디어아트 프로젝트**입니다.
 
-- **규격**: **225초 (3분 45초)**, 30fps, 총 **6,750프레임** (0000~6749), 48kHz 스테레오 사운드, 형식 **MP4 (H.264 / AAC)**.
+- **규격**: **235초 (3분 55초)**, 30fps, 총 **7,050프레임** (0000~7049), 48kHz 스테레오 사운드, 형식 **MP4 (H.264 / AAC)**.
+- **프레젠테이션**: 시작·끝 각각 5초 검은 화면, 본편 진입/종료 시 각각 1초 페이드 인/아웃. 본편 길이는 225초로 유지.
 - **화질**:
   - **4K UHD 와이드**: 3840×2160 (16:9 Cinematic UHD).
   - **4K Fulldome 돔 스크린**: 3840×3840 (1:1 원형 어안 Domemaster, 천정 Zenith 중심, 지평선 Horizon 림 마스크). 2160×2160은 빠른 검토용 프리뷰입니다.
@@ -57,7 +58,7 @@ NASA JPL Horizons API (DE441 역서, `Voyager_1_ST+refit2022_m` 궤도해)로부
 
 ---
 
-## 2. 장면 구성 (총 225초 / 3분 45초 타임라인)
+## 2. 장면 구성 (225초 본편 / 총 235초·3분 55초 타임라인)
 
 | 장면 | 구간 | 길이 | 제목 | 보이저 1호의 시선 & 영화적 연출 | 직관적 안내 텍스트 |
 |---|---|---:|---|---|---|
@@ -81,7 +82,7 @@ voyager1_LightDayGap/
 ├── docs/
 │   └── film_spec.md                 # 4K UHD 돔 스크린 및 미디어아트 상세 명세서
 ├── config/
-│   └── film.json                    # 4K UHD 기본 해상도, S00 시작 화면, 225초 설정
+│   └── film.json                    # 4K UHD 기본 해상도, S00 시작 화면, 235초 프레젠테이션 설정
 ├── scripts/
 │   ├── fetch_horizons.py            # JPL Horizons API 원시 상태 벡터 취득기
 │   ├── prepare_trajectory_data.py   # 궤도 데이터 전처리 및 다운샘플링
@@ -89,9 +90,9 @@ voyager1_LightDayGap/
 ├── src/
 │   ├── ephemeris.py                 # 3차 Hermite 상태 벡터 보간 및 UTC/TDB 변환
 │   ├── physics.py                   # 광행시간 반복 수치해법, 기하 거리, 상대론
-│   ├── timeline.py                  # 225초 (6,750 프레임) ↔ 10개 장면 매핑
+│   ├── timeline.py                  # 235초 (7,050 프레임) 출력 ↔ 225초 본편 장면 매핑
 │   ├── camera.py                    # 4K Fulldome 돔 마스터 어안 투영 & 보이저 가상 카메라
-│   ├── audio.py                     # 48kHz 225초 스테레오 마스터 사운드 합성기
+│   ├── audio.py                     # 48kHz 235초 스테레오 마스터 사운드 합성기
 │   ├── render.py                    # 4K UHD(3840×2160) / 4K 돔(3840×3840) H.264/AAC MP4 렌더러
 │   └── scenes/
 │       └── scenes.py                # S00 프롤로그 시작 화면, 돔 마스크, 시네마틱 렌더러
@@ -100,11 +101,11 @@ voyager1_LightDayGap/
 │   ├── processed/                   # 전처리된 궤도 및 1광일 이벤트 JSON
 │   └── data_manifest.json           # 데이터 매니페스트
 ├── subtitles/
-│   └── narration_ko.srt             # S00 시작 화면 설명 포함 1인칭 자막 (225초 싱크)
+│   └── narration_ko.srt             # 5초 리드인을 반영한 1인칭 자막 (235초 싱크)
 ├── output/
-│   ├── audio/mix.wav                # 48kHz 225초 스테레오 오디오 믹스
+│   ├── audio/mix.wav                # 48kHz 235초 스테레오 오디오 믹스
 │   ├── snapshots/                   # 10개 장면 4K 대표 스냅샷 이미지
-│   └── Voyager1_LightDayGap_4K_3m45s.mp4 # 최종 4K MP4 비디오
+│   └── Voyager1_LightDayGap_4K_3m55s.mp4 # 최종 4K MP4 비디오
 ├── index.html                       # 4K 시작 화면 오버레이 & MP4 녹화 웹 인터랙티브 시안
 ├── script.js                        # 시작 화면 제어, 4K MP4 실시간 캡처, 돔 어안 렌더러
 ├── style.css                        # 4K 시작 화면 및 인터페이스 스타일시트
@@ -122,11 +123,11 @@ Python 3.10+ 환경 및 `uv`를 사용합니다.
 uv sync
 ```
 
-### 4.2 오디오 합성 (48kHz 스테레오 WAV, 225초)
+### 4.2 오디오 합성 (48kHz 스테레오 WAV, 235초)
 ```bash
 uv run python src/audio.py
 ```
-`output/audio/mix.wav`에 225초 분량(10,800,000 샘플)의 마스터 사운드가 생성됩니다.
+`output/audio/mix.wav`에 235초 분량(11,280,000 샘플)의 마스터 사운드가 생성됩니다. 시작과 끝 5초는 무음입니다.
 
 ### 4.3 4K 스냅샷 출력 (S00~S09 10개 장면)
 ```bash
@@ -138,7 +139,7 @@ uv run python src/render.py --snapshots --dome
 ```
 `output/snapshots/`에 S00 시작 화면을 포함한 고화질 4K 이미지가 저장됩니다.
 
-### 4.4 4K MP4 비디오 렌더링 (225초 / 3분 45초)
+### 4.4 4K MP4 비디오 렌더링 (235초 / 3분 55초)
 ```bash
 # 4K UHD 시네마틱 비디오 (3840×2160, H.264/AAC MP4 기본 출력)
 uv run python src/render.py --video

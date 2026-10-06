@@ -1,7 +1,8 @@
 """48kHz Stereo Audio Synthesizer for VOYAGER 1 — LIGHT DAY GAP.
 
 Compliant with 4K UHD & 3~4 min cinematic dome format:
-- 225 seconds (10,800,000 samples @ 48,000 Hz, stereo 16-bit PCM)
+- 235 seconds (11,280,000 samples @ 48,000 Hz, stereo 16-bit PCM)
+- The 225-second composition is silent for the 5-second black lead-in/out.
 - Deterministic seed for reproducible sound generation
 - Composed of:
     - Base ambient drone & low-frequency resonance
@@ -20,23 +21,39 @@ Compliant with 4K UHD & 3~4 min cinematic dome format:
 import math
 import struct
 import wave
+import json
 from pathlib import Path
 import numpy as np
 
 
 class AudioComposer:
-    def __init__(self, sample_rate: int = 48000, duration_s: float = 225.0, seed: int = 19770905):
+    def __init__(
+        self,
+        sample_rate: int = 48000,
+        content_duration_s: float = 225.0,
+        lead_in_s: float = 5.0,
+        lead_out_s: float = 5.0,
+        fade_in_s: float = 1.0,
+        fade_out_s: float = 1.0,
+        seed: int = 19770905,
+    ):
         self.sr = sample_rate
-        self.duration_s = duration_s
+        self.content_duration_s = content_duration_s
+        self.lead_in_s = lead_in_s
+        self.lead_out_s = lead_out_s
+        self.fade_in_s = fade_in_s
+        self.fade_out_s = fade_out_s
+        self.duration_s = self.lead_in_s + self.content_duration_s + self.lead_out_s
         self.n_samples = int(self.sr * self.duration_s)
+        self.content_n_samples = int(self.sr * self.content_duration_s)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
 
     def render(self) -> np.ndarray:
-        """Render the complete 225-second stereo audio buffer [2, n_samples] in float32 (-1.0 to 1.0)."""
-        t = np.linspace(0, self.duration_s, self.n_samples, endpoint=False, dtype=np.float32)
-        left = np.zeros(self.n_samples, dtype=np.float32)
-        right = np.zeros(self.n_samples, dtype=np.float32)
+        """Render the complete output buffer with silent black lead-in/out."""
+        t = np.linspace(0, self.content_duration_s, self.content_n_samples, endpoint=False, dtype=np.float32)
+        left = np.zeros(self.content_n_samples, dtype=np.float32)
+        right = np.zeros(self.content_n_samples, dtype=np.float32)
 
         print("[*] Generating base ambient drone...")
         # 1. Base cosmic drone (deep sub-bass 55Hz (A1) and 82.4Hz (E2) with slow phase drifts)
@@ -154,6 +171,13 @@ class AudioComposer:
         left[s9_mask] = (left[s9_mask] + final_chime) * fade_env
         right[s9_mask] = (right[s9_mask] + final_chime) * fade_env
 
+        # Match the audio envelope to the video fade at both story boundaries.
+        fade_in_env = np.clip(t / self.fade_in_s, 0.0, 1.0) if self.fade_in_s else 1.0
+        fade_out_env = np.clip((self.content_duration_s - t) / self.fade_out_s, 0.0, 1.0) if self.fade_out_s else 1.0
+        presentation_env = np.minimum(fade_in_env, fade_out_env)
+        left *= presentation_env
+        right *= presentation_env
+
         # Master limiter & normalization to avoid clipping (-0.95 to +0.95 peak)
         peak = max(np.max(np.abs(left)), np.max(np.abs(right)), 1e-4)
         if peak > 0.95:
@@ -161,7 +185,10 @@ class AudioComposer:
             left *= norm_factor
             right *= norm_factor
 
-        return np.stack([left, right], axis=0)
+        story_audio = np.stack([left, right], axis=0)
+        lead_in_samples = int(self.sr * self.lead_in_s)
+        lead_out_samples = int(self.sr * self.lead_out_s)
+        return np.pad(story_audio, ((0, 0), (lead_in_samples, lead_out_samples)))
 
     def export_wav(self, out_path: str = "output/audio/mix.wav"):
         """Synthesize and write 16-bit PCM stereo WAV file."""
@@ -186,5 +213,16 @@ class AudioComposer:
 
 
 if __name__ == "__main__":
-    composer = AudioComposer(sample_rate=48000, duration_s=225.0)
+    config_path = Path(__file__).resolve().parent.parent / "config" / "film.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    presentation = config.get("presentation", {})
+    composer = AudioComposer(
+        sample_rate=int(config.get("audio_hz", 48000)),
+        content_duration_s=float(config.get("content_duration_s", 225.0)),
+        lead_in_s=float(presentation.get("lead_in_black_s", 5.0)),
+        lead_out_s=float(presentation.get("lead_out_black_s", 5.0)),
+        fade_in_s=float(presentation.get("fade_in_s", 1.0)),
+        fade_out_s=float(presentation.get("fade_out_s", 1.0)),
+        seed=int(config.get("seed", 19770905)),
+    )
     composer.export_wav()

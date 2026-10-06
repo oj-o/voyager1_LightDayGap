@@ -740,6 +740,10 @@ class SceneRenderer:
 
     def render_frame(self, state: Dict[str, Any]) -> Image.Image:
         """Render a single frame given timeline state dictionary."""
+        presentation_alpha = float(state.get("presentation_alpha", 1.0))
+        if presentation_alpha <= 0.0:
+            return Image.new("RGB", (self.w, self.h), (0, 0, 0))
+
         # Create dark background
         img = Image.new("RGBA", (self.w, self.h), COLORS["bg"] + (255,))
         draw = ImageDraw.Draw(img, "RGBA")
@@ -773,5 +777,9 @@ class SceneRenderer:
         rgb_img = img.convert("RGB")
         if self.dome_mode:
             rgb_img = self.apply_dome_circular_mask(rgb_img)
+
+        if presentation_alpha < 1.0:
+            black = Image.new("RGB", rgb_img.size, (0, 0, 0))
+            rgb_img = Image.blend(black, rgb_img, presentation_alpha)
 
         return rgb_img

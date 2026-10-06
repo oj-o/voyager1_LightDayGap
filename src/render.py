@@ -1,7 +1,8 @@
 """Offline frame-by-frame renderer and video exporter for VOYAGER 1 — LIGHT DAY GAP.
 
 Compliant with 4K UHD & 3~4 min cinematic dome format:
-- 225 seconds (3m 45s), 30 fps, exactly 6,750 frames (index 0 to 6749)
+- 235 seconds (3m 55s), 30 fps, exactly 7,050 frames (index 0 to 7049)
+- 5-second black lead-in/out with one-second fade-in/out around the 225-second story
 - 4K UHD (3840x2160) & 4K Fulldome Domemaster (3840x3840 / 2160x2160)
 - Format: MP4 (H.264 video + 48kHz AAC stereo audio)
 - Deterministic offline frame generation with fixed random seed
@@ -42,7 +43,7 @@ def render_single_frame(
     dome_mode: bool = False,
     out_path: str = None
 ) -> Image.Image:
-    """Render a single frame deterministically by index (0..6749) in 4K."""
+    """Render a single output frame deterministically by index (0..7049) in 4K."""
     timeline = Timeline()
     state = timeline.frame_info(frame_index)
     renderer = SceneRenderer(width=width, height=height, dome_mode=dome_mode)
@@ -68,7 +69,8 @@ def export_scene_snapshots(
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # Frame indices representing midpoints of each scene in 225s timeline
+    # Frame indices representing midpoints of each scene in the output timeline.
+    lead_in_frames = round(timeline.lead_in_black_s * timeline.fps)
     mid_frames = [
         (210, "S00_Prologue_Title_Card"),
         (660, "S01_Arrival_Signal"),
@@ -82,6 +84,7 @@ def export_scene_snapshots(
         (6540, "S09_Farewell_Earth")
     ]
 
+    mid_frames = [(lead_in_frames + frame_idx, label) for frame_idx, label in mid_frames]
     mode_label = f"Fulldome ({width}x{height})" if dome_mode else f"Widescreen 4K ({width}x{height})"
     print(f"[*] Exporting 10 scene snapshot images [{mode_label}] to {out}...")
     for frame_idx, label in mid_frames:
@@ -95,12 +98,12 @@ def export_scene_snapshots(
 
 
 def render_video(
-    out_video_path: str = "output/Voyager1_LightDayGap_4K_3m45s.mp4",
+    out_video_path: str = "output/Voyager1_LightDayGap_4K_3m55s.mp4",
     width: int = 3840,
     height: int = 2160,
     dome_mode: bool = False,
     fps: int = 30,
-    duration_s: float = 225.0,
+    duration_s: float = None,
     audio_path: str = "output/audio/mix.wav",
     crf: int = 18,
     preset: str = "fast",
@@ -117,8 +120,10 @@ def render_video(
     pixel_format = export_config.get("pixel_format", "yuv420p")
     ffmpeg_video_codec = "libx264" if video_codec == "h264" else video_codec
     ffmpeg_exe = get_ffmpeg_path()
-    total_frames = int(duration_s * fps) if max_frames is None else min(int(duration_s * fps), max_frames)
     timeline = Timeline()
+    if duration_s is None:
+        duration_s = timeline.duration_s
+    total_frames = int(round(duration_s * fps)) if max_frames is None else min(int(round(duration_s * fps)), max_frames)
     renderer = SceneRenderer(width=width, height=height, dome_mode=dome_mode)
 
     out_file = Path(out_video_path)
@@ -211,18 +216,18 @@ if __name__ == "__main__":
         w = 2160 if args.fhd else int(dome_master["width"])
         h = 2160 if args.fhd else int(dome_master["height"])
         is_dome = True
-        default_out = f"output/Voyager1_LightDayGap_Fulldome_{w}x{h}_4K_3m45s.mp4"
+        default_out = f"output/Voyager1_LightDayGap_Fulldome_{w}x{h}_4K_3m55s.mp4"
     elif args.fhd:
         w = 1920
         h = 1080
         is_dome = False
-        default_out = "output/Voyager1_LightDayGap_1080p_3m45s.mp4"
+        default_out = "output/Voyager1_LightDayGap_1080p_3m55s.mp4"
     else:
         # Default: 4K UHD (3840x2160)
         w = 3840
         h = 2160
         is_dome = False
-        default_out = "output/Voyager1_LightDayGap_4K_3m45s.mp4"
+        default_out = "output/Voyager1_LightDayGap_4K_3m55s.mp4"
 
     if args.snapshots:
         export_scene_snapshots(width=w, height=h, dome_mode=is_dome)

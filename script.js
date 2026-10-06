@@ -33,9 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const simpleHudText = document.querySelector("#simpleHudText");
   const chapterMarkers = document.querySelector("#chapterMarkers");
 
-  const DURATION_S = 225; // 3 minutes 45 seconds
+  const CONTENT_DURATION_S = 225; // 3 minutes 45 seconds of story
+  const LEAD_IN_BLACK_S = 5;
+  const LEAD_OUT_BLACK_S = 5;
+  const FADE_IN_S = 1;
+  const FADE_OUT_S = 1;
+  const DURATION_S = LEAD_IN_BLACK_S + CONTENT_DURATION_S + LEAD_OUT_BLACK_S; // 3 minutes 55 seconds
   const FPS = 30;
-  const LAST_FRAME_S = 6749 / FPS;
+  const LAST_FRAME_S = DURATION_S - (1 / FPS);
   const COLORS = {
     background: "#03060b",
     cyan: "#68d8e8",
@@ -163,6 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, value));
+  const storyTimeFor = (time) => clamp(time - LEAD_IN_BLACK_S, 0, CONTENT_DURATION_S - (1 / FPS));
+  const presentationOpacity = (time) => {
+    const storyTime = time - LEAD_IN_BLACK_S;
+    if (storyTime < 0 || storyTime >= CONTENT_DURATION_S) return 0;
+    const fadeIn = FADE_IN_S ? Math.min(1, storyTime / FADE_IN_S) : 1;
+    const fadeOut = FADE_OUT_S ? Math.min(1, (CONTENT_DURATION_S - storyTime) / FADE_OUT_S) : 1;
+    return Math.min(fadeIn, fadeOut);
+  };
   const mix = (a, b, amount) => a + (b - a) * amount;
   const smoothstep = (start, end, value) => { const x = clamp((value - start) / (end - start)); return x * x * (3 - 2 * x); };
   const easeInOut = (value) => value < 0.5 ? 2 * value * value : 1 - Math.pow(-2 * value + 2, 2) / 2;
@@ -200,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
       button.type = "button";
       button.textContent = scene.id;
       button.title = `${scene.id} · ${scene.title}`;
-      button.addEventListener("click", () => { filmTime = scene.start; playing = false; syncTransport(); });
+      button.addEventListener("click", () => { filmTime = LEAD_IN_BLACK_S + scene.start; playing = false; syncTransport(); });
       chapterMarkers.append(button);
     });
   }
@@ -555,22 +568,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return audio;
   }
 
-  function updateAudio(index) {
-    if (!audio || !soundOn) return;
+  function updateAudio(index, opacity) {
+    if (!audio) return;
     const now = audio.context.currentTime;
     const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
     audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
-    audio.lowGain.gain.setTargetAtTime(.055, now, .35);
-    audio.highGain.gain.setTargetAtTime(index === 7 ? .022 : .011, now, .35);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, now, .12);
+    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .022 : .011) * opacity : .0001, now, .12);
   }
 
   function toggleSound() {
     const sound = ensureAudio(); if (!sound) return;
     soundOn = !soundOn;
     if (sound.context.state === "suspended") sound.context.resume();
-    sound.lowGain.gain.setTargetAtTime(soundOn ? .055 : .0001, sound.context.currentTime, .18);
-    sound.highGain.gain.setTargetAtTime(soundOn ? .011 : .0001, sound.context.currentTime, .18);
+    const opacity = presentationOpacity(filmTime);
+    sound.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, sound.context.currentTime, .18);
+    sound.highGain.gain.setTargetAtTime(soundOn ? .011 * opacity : .0001, sound.context.currentTime, .18);
     muteButton.textContent = soundOn ? "소리 끄기" : "소리 켜기";
     muteButton.setAttribute("aria-pressed", String(soundOn));
   }
@@ -655,7 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
       a.href = url;
       const isDomeStr = isDomeMode ? "Fulldome" : "Wide";
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      a.download = `Voyager1_LightDayGap_4K_${isDomeStr}_${timestamp}.${ext}`;
+      a.download = `Voyager1_LightDayGap_3m55s_4K_${isDomeStr}_${timestamp}.${ext}`;
       document.body.appendChild(a);
       a.click();
       setTimeout(() => {
@@ -691,11 +705,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function syncTransport() {
-    const index = sceneFor(filmTime);
+    const index = sceneFor(storyTimeFor(filmTime));
     setSceneReadout(index);
     timeline.value = String(filmTime);
     const recIndicator = isRecording ? " [REC]" : "";
-    clock.textContent = `${formatClock(filmTime)} / 03:45${recIndicator}`;
+    clock.textContent = `${formatClock(filmTime)} / 03:55${recIndicator}`;
     playButton.textContent = playing ? "일시정지" : "재생";
     playButton.setAttribute("aria-pressed", String(playing));
   }
@@ -712,11 +726,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
-    const index = sceneFor(Math.min(filmTime, LAST_FRAME_S));
-    drawBackground(filmTime);
-    renderScene(index, filmTime);
-    drawDomeOverlay();
-    updateAudio(index);
+    const storyTime = storyTimeFor(filmTime);
+    const opacity = presentationOpacity(filmTime);
+    const index = sceneFor(storyTime);
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, width, height);
+    if (opacity > 0) {
+      drawBackground(storyTime);
+      renderScene(index, storyTime);
+      drawDomeOverlay();
+      if (opacity < 1) {
+        ctx.save();
+        ctx.globalAlpha = 1 - opacity;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, width, height);
+        ctx.restore();
+      }
+    }
+    updateAudio(index, opacity);
     syncTransport();
     requestAnimationFrame(render);
   }

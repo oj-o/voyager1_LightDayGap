@@ -3,9 +3,16 @@
   "subtitle": "하루 늦게 도착하는 우리 (보이저 1호의 시선)",
   "format": "mp4",
   "resolution": "4k_uhd",
-  "duration_s": 225,
+  "content_duration_s": 225,
+  "duration_s": 235,
   "fps": 30,
-  "total_frames": 6750,
+  "total_frames": 7050,
+  "presentation": {
+    "lead_in_black_s": 5,
+    "lead_out_black_s": 5,
+    "fade_in_s": 1,
+    "fade_out_s": 1
+  },
   "width": 3840,
   "height": 2160,
   "render_4k": {
