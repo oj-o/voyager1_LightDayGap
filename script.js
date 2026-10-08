@@ -8,6 +8,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.querySelector("#artCanvas");
   const ctx = canvas.getContext("2d", { alpha: false });
+  const experience = document.querySelector(".experience");
   const timeline = document.querySelector("#timeline");
   const playButton = document.querySelector("#playButton");
   const muteButton = document.querySelector("#muteButton");
@@ -59,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 15,
       title: "프롤로그 · 하루의 틈",
       meta: "시작 화면 · 작품 개요 · 4K UHD",
-      caption: "우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.",
+      caption: ["빛은 바로 닿지 않는다.", "먼 곳의 ‘지금’은 이미 과거다."],
       hud: "VOYAGER 1 — LIGHT DAY GAP · 4K UHD · FORMAT MP4"
     },
     {
@@ -68,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 30,
       title: "어둠 속의 신호",
       meta: "259억 km 심연 · 가상 수신 사건",
-      caption: "칠흑의 우주에서, 어제의 지구가 보낸 신호가 내게 닿았다.",
+      caption: ["어제 지구가 보낸 인사가", "이제야 내 안테나에 닿는다."],
       hud: "지구와의 거리: 1광일 (259억 km) · 신호 지연: 약 24시간"
     },
     {
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 60,
       title: "떠나온 49년의 궤적",
       meta: "1977 발사 → 목성·토성 → 태양계 탈출",
-      caption: "행성들의 중력을 딛고, 나는 태양의 품을 벗어났다.",
+      caption: ["나는 행성들의 중력을 빌려", "태양의 품을 벗어났다."],
       hud: "항행 속도: 초속 약 17 km · 황도면 위쪽으로 비행 중"
     },
     {
@@ -86,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 85,
       title: "마지막으로 본 집",
       meta: "1990 창백한 푸른 점 이후 카메라 영구 정지",
-      caption: "1990년, 마지막으로 집을 뒤돌아본 뒤 나의 눈은 영원히 감겼다.",
+      caption: ["마지막으로 돌아본 지구는", "이제 아주 작은 빛이 되었다."],
       hud: "지구의 겉보기 크기: 0.1015 초각 (극미세 점광원)"
     },
     {
@@ -95,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 120,
       title: "1광일의 심연",
       meta: "빛으로 하루 걸리는 거리 · 259억 km",
-      caption: "빛조차 하루가 걸리는 거리. 내가 보는 것은 언제나 어제의 당신들.",
+      caption: ["빛도 하루가 걸리는 곳에서,", "나는 어제의 지구를 본다."],
       hud: "1광일 = 25,902,068,371 km (약 173.1 AU)"
     },
     {
@@ -104,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 150,
       title: "두 장소의 하루",
       meta: "보이저의 하루 147만 km · 지구의 하루 257만 km",
-      caption: "내가 고요히 성간을 가르는 동안, 지구는 맹렬히 태양을 돈다.",
+      caption: ["같은 하루에도 우리는", "서로 다른 거리를 지나간다."],
       hud: "지구 공전: 257만 km/일 · 보이저 항행: 147만 km/일"
     },
     {
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 175,
       title: "엇갈리는 시계",
       meta: "상대론적 시공간 · 흐르는 시간의 차이",
-      caption: "거리의 지연 너머, 나의 시계와 지구의 시계도 서로 어긋난다.",
+      caption: ["멀어진 만큼 우리의 시계도", "아주 조금, 다르게 흐른다."],
       hud: "특수상대론 시계 차이: 매일 약 139마이크로초"
     },
     {
@@ -122,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 195,
       title: "성간의 떨림",
       meta: "플라스마파(PWS) 관측 · 눈을 감은 뒤의 귀",
-      caption: "눈은 감겼지만, 성간 플라스마의 떨림이 내 몸을 울린다.",
+      caption: ["눈은 감겼지만,", "성간의 떨림이 내 안테나를 울린다."],
       hud: "플라스마 전자 진동 주파수: 2.2 ~ 3.0 kHz 계측"
     },
     {
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 212,
       title: "원자의 심박수",
       meta: "RTG 플루토늄-238 붕괴열 · 미세한 생명선",
-      caption: "심장에 품은 원자들의 온기로, 나는 마지막 신호를 띄운다.",
+      caption: ["작은 원자의 온기가", "지구로 향할 신호를 만든다."],
       hud: "RTG 원자력 전원: 20와트 미약한 전파로 송신"
     },
     {
@@ -140,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 225,
       title: "내일로 보내는 응답",
       meta: "보이저 가상 시선 · 어제의 지구를 향하여",
-      caption: "안녕, 나의 지구. 지금 여기 도착한 것은 어제의 당신들.",
+      caption: ["내가 보낸 오늘은 내일 닿는다.", "안녕, 나의 지구."],
       hud: "VOYAGER 1 — 1 LIGHT-DAY PASSING · 2026"
     }
   ];
@@ -197,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sceneId.textContent = scene.id;
     sceneTitle.textContent = scene.title;
     sceneMeta.textContent = scene.meta;
-    captionText.textContent = scene.caption;
+    captionText.textContent = Array.isArray(scene.caption) ? scene.caption.join("\n") : scene.caption;
     if (simpleHudText) simpleHudText.textContent = scene.hud;
     document.querySelectorAll(".chapter-marker").forEach((button, buttonIndex) => {
       button.classList.toggle("active", buttonIndex === index);
@@ -591,6 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function toggleDomeMode() {
     isDomeMode = !isDomeMode;
+    if (experience) experience.classList.toggle("dome-active", isDomeMode);
     domeButton.classList.toggle("active", isDomeMode);
     domeButton.setAttribute("aria-pressed", String(isDomeMode));
     domeButton.textContent = isDomeMode ? "돔 스크린 180° ON" : "돔 스크린 180° OFF";

@@ -31,8 +31,11 @@ h1 span { color: var(--gold); font-weight: 400; }
 .status-dot { background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px rgba(216, 183, 120, .75); height: .46rem; margin-top: .35rem; width: .46rem; }
 .status-dot.connected { background: var(--cyan); box-shadow: 0 0 12px rgba(104, 216, 232, .9); }
 .caption { bottom: clamp(5.5rem, 12.5vh, 8rem); left: 50%; max-width: min(48rem, 88vw); text-align: center; transform: translateX(-50%); width: max-content; }
-.caption p { color: rgba(240, 249, 250, .96); font-size: clamp(.88rem, 1.45vw, 1.3rem); font-weight: 500; line-height: 1.6; margin: 0; text-shadow: 0 1px 18px #03060b; }
+.caption p { color: rgba(240, 249, 250, .96); font-size: clamp(.88rem, 1.45vw, 1.3rem); font-weight: 500; line-height: 1.6; margin: 0; text-shadow: 0 1px 18px #03060b; white-space: pre-line; }
 .caption .simple-hud { color: var(--gold); font-family: "DM Mono", ui-monospace, monospace; font-size: clamp(.65rem, .85vw, .82rem); letter-spacing: 0.05em; margin-top: .4rem; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9); }
+.experience.dome-active .caption { background: linear-gradient(90deg, rgba(3, 6, 11, 0), rgba(3, 6, 11, .78) 16%, rgba(3, 6, 11, .78) 84%, rgba(3, 6, 11, 0)); bottom: auto; left: 50%; max-width: calc(100% - 2rem); padding: .5rem 1.15rem .55rem; top: calc(50% + min(13.5svh, 13.5vw)); transform: translate(-50%, -50%); width: min(38rem, 58vw); }
+.experience.dome-active .caption p { font-size: clamp(.82rem, 1.2vw, 1.1rem); line-height: 1.5; }
+.experience.dome-active .caption .simple-hud { display: none; }
 .control-dock { backdrop-filter: blur(12px); background: linear-gradient(180deg, rgba(3, 6, 11, 0), var(--panel) 35%); bottom: 0; left: 0; padding: 1.2rem clamp(1.25rem, 3.2vw, 4rem) 1.4rem; right: 0; }
 .transport { align-items: center; display: flex; gap: .65rem; margin-bottom: .8rem; }
 .transport button { background: rgba(104, 216, 232, .08); border: 1px solid rgba(104, 216, 232, .35); border-radius: 99px; color: var(--ink); cursor: pointer; font-size: .72rem; padding: .38rem .7rem; transition: all .2s ease; }
@@ -325,4 +328,3 @@ h1 span { color: var(--gold); font-weight: 400; }
 .essay-body strong {
   color: #fff;
 }
-
