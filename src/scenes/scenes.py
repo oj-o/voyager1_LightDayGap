@@ -211,26 +211,14 @@ class SceneRenderer:
         max_card_width = int(safe_radius * 1.67)
         max_text_width = int(safe_radius * 1.45)
 
-        # The opening card already supplies a title and science context.  Its lower
-        # caption must still remain visible, but duplicating that content would crowd it.
-        show_context = state.get("scene_id") != "S00"
-        if show_context:
-            title = state.get("scene_title", "")
-            title_font = self._fit_font(draw, [title], max_text_width, int(self.h * 0.018), int(self.h * 0.012), bold=True)
-            self._draw_centered_text(draw, cx, int(cy - safe_radius * 0.89), title, title_font, COLORS["white"])
-
-            tag = state.get("scene_dome_science_tag", "")
-            if tag:
-                tag_font = self._fit_font(draw, [tag], max_text_width, int(self.h * 0.013), int(self.h * 0.010), bold=True)
-                self._draw_centered_text(draw, cx, int(cy - safe_radius * 0.68), tag, tag_font, COLORS["earth_cyan"])
-
         lines = [line for line in state.get("scene_dome_caption", []) if line]
         if not lines:
             lines = [state.get("scene_caption", "")]
         lines = lines[:int(settings.get("max_lines", 2))]
         caption_font = self._fit_font(draw, lines, max_text_width, int(self.h * 0.018), int(self.h * 0.013), bold=True)
-        fact = state.get("scene_simple_hud", "") if show_context else ""
-        fact_font = self._fit_font(draw, [fact], max_text_width, int(self.h * 0.011), int(self.h * 0.008))
+        # Keep the dome scene close to the original film: one short subtitle,
+        # without a second line of technical explanation.
+        fact = ""
 
         line_height = int(self.h * 0.024)
         caption_height = max(1, len(lines)) * line_height
@@ -349,16 +337,12 @@ class SceneRenderer:
             f_kicker = font_mgr.get_font(int(self.h * 0.015), bold=True)
             f_title = font_mgr.get_font(int(self.h * 0.034), bold=True)
             f_subtitle = font_mgr.get_font(int(self.h * 0.018), bold=True)
-            f_fact = font_mgr.get_font(int(self.h * 0.013))
             alpha = int(255 * fade)
 
             self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.29), "VOYAGER 1", f_kicker, (104, 216, 232, alpha))
             self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.21), "LIGHT DAY GAP", f_title, (232, 244, 247, alpha))
             self._draw_centered_text(draw, int(cx), int(self.dome_cy - r * 0.10), "하루 늦게 도착하는 우리", f_subtitle, (216, 183, 120, alpha))
 
-            # The premise now appears once in the shared lower subtitle card.
-            # Keep only a compact format fact here so the two elements never overlap.
-            self._draw_centered_text(draw, int(cx), int(self.dome_cy + r * 0.02), "1광일 = 약 24시간 · MP4 · 3840×3840", f_fact, (216, 183, 120, alpha))
             return
 
         # Fading curve for smooth entrance and transition

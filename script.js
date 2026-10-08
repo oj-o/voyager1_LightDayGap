@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 15,
       title: "프롤로그 · 하루의 틈",
       meta: "시작 화면 · 작품 개요 · 4K UHD",
-      caption: ["빛은 바로 닿지 않는다.", "먼 곳의 ‘지금’은 이미 과거다."],
+      caption: "먼 곳의 지금은 이미 과거다.",
       hud: "VOYAGER 1 — LIGHT DAY GAP · 4K UHD · FORMAT MP4"
     },
     {
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 30,
       title: "어둠 속의 신호",
       meta: "259억 km 심연 · 가상 수신 사건",
-      caption: ["어제 지구가 보낸 인사가", "이제야 내 안테나에 닿는다."],
+      caption: "어제의 신호가 오늘 닿는다.",
       hud: "지구와의 거리: 1광일 (259억 km) · 신호 지연: 약 24시간"
     },
     {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 60,
       title: "떠나온 49년의 궤적",
       meta: "1977 발사 → 목성·토성 → 태양계 탈출",
-      caption: ["나는 행성들의 중력을 빌려", "태양의 품을 벗어났다."],
+      caption: "나는 중력을 빌려 떠났다.",
       hud: "항행 속도: 초속 약 17 km · 황도면 위쪽으로 비행 중"
     },
     {
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 85,
       title: "마지막으로 본 집",
       meta: "1990 창백한 푸른 점 이후 카메라 영구 정지",
-      caption: ["마지막으로 돌아본 지구는", "이제 아주 작은 빛이 되었다."],
+      caption: "지구는 작은 빛이 되었다.",
       hud: "지구의 겉보기 크기: 0.1015 초각 (극미세 점광원)"
     },
     {
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 120,
       title: "1광일의 심연",
       meta: "빛으로 하루 걸리는 거리 · 259억 km",
-      caption: ["빛도 하루가 걸리는 곳에서,", "나는 어제의 지구를 본다."],
+      caption: "빛이 하루 걸리는 거리.",
       hud: "1광일 = 25,902,068,371 km (약 173.1 AU)"
     },
     {
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 150,
       title: "두 장소의 하루",
       meta: "보이저의 하루 147만 km · 지구의 하루 257만 km",
-      caption: ["같은 하루에도 우리는", "서로 다른 거리를 지나간다."],
+      caption: "서로 다른 하루를 건넌다.",
       hud: "지구 공전: 257만 km/일 · 보이저 항행: 147만 km/일"
     },
     {
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 175,
       title: "엇갈리는 시계",
       meta: "상대론적 시공간 · 흐르는 시간의 차이",
-      caption: ["멀어진 만큼 우리의 시계도", "아주 조금, 다르게 흐른다."],
+      caption: "멀어질수록 시계가 어긋난다.",
       hud: "특수상대론 시계 차이: 매일 약 139마이크로초"
     },
     {
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 195,
       title: "성간의 떨림",
       meta: "플라스마파(PWS) 관측 · 눈을 감은 뒤의 귀",
-      caption: ["눈은 감겼지만,", "성간의 떨림이 내 안테나를 울린다."],
+      caption: "성간의 떨림을 듣는다.",
       hud: "플라스마 전자 진동 주파수: 2.2 ~ 3.0 kHz 계측"
     },
     {
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 212,
       title: "원자의 심박수",
       meta: "RTG 플루토늄-238 붕괴열 · 미세한 생명선",
-      caption: ["작은 원자의 온기가", "지구로 향할 신호를 만든다."],
+      caption: "작은 원자가 신호를 만든다.",
       hud: "RTG 원자력 전원: 20와트 미약한 전파로 송신"
     },
     {
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 225,
       title: "내일로 보내는 응답",
       meta: "보이저 가상 시선 · 어제의 지구를 향하여",
-      caption: ["내가 보낸 오늘은 내일 닿는다.", "안녕, 나의 지구."],
+      caption: "내 오늘은 내일 닿는다.",
       hud: "VOYAGER 1 — 1 LIGHT-DAY PASSING · 2026"
     }
   ];
@@ -309,26 +309,8 @@ document.addEventListener("DOMContentLoaded", () => {
     drawText("VOYAGER 1 — LIGHT DAY GAP", cx, cy - 84, { align: "center", color: COLORS.white, size: Math.min(width * 0.038, 36), weight: 700 });
     drawText("하루 늦게 도착하는 우리 (보이저 1호의 시선)", cx, cy - 44, { align: "center", color: COLORS.gold, size: Math.min(width * 0.02, 19) });
 
-    const cardW = Math.min(width * 0.78, 680);
-    const cardH = 145;
-    const x = cx - cardW * .5;
-    const y = cy - 18;
-
-    ctx.save();
-    ctx.fillStyle = "rgba(4, 12, 22, .88)";
-    ctx.strokeStyle = "rgba(104, 216, 232, .35)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(x, y, cardW, cardH, 8);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    drawText("“우리는 같은 우주에 있지만, 서로의 현재를 곧바로 받을 수는 없다.”", cx, y + 36, { align: "center", color: COLORS.cyan, size: 14, weight: 600 });
-    drawText("1977년 지구를 떠난 보이저 1호는 2026년 11월 18일, 지구로부터 1광일(259억 km)의 지점을 통과한다.", cx, y + 72, { align: "center", color: COLORS.white, size: 12 });
-    drawText("1990년 '창백한 푸른 점'을 끝으로 눈을 감은 탐사선의 시선으로 바라본 지연된 시공간의 서사.", cx, y + 102, { align: "center", color: COLORS.muted, size: 11 });
-
-    drawText("화질 4K UHD (3840×2160)  ·  천체투영관 FULLDOME  ·  형식 MP4", cx, y + cardH + 28, { align: "center", color: COLORS.gold, size: 11, family: "mono" });
+    // The film carries the explanation through imagery; keep the prologue
+    // intentionally close to the original title-card treatment.
   }
 
   // --- SCENE 1: 어둠 속의 신호 (15 - 30s) ---
@@ -629,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const selectedFormat = recordFormatSelect ? recordFormatSelect.value : "mp4";
+    const selectedFormat = recordFormatSelect ? recordFormatSelect.value : "webm";
     let mimeType = "video/webm";
     let ext = "webm";
 
@@ -644,7 +626,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (ext !== "mp4") {
         mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
-        ext = "mp4";
+        // Chromium commonly lacks MP4 MediaRecorder support; keep the
+        // downloaded extension truthful when falling back to WebM.
+        ext = "webm";
       }
     } else {
       mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
@@ -682,14 +666,14 @@ document.addEventListener("DOMContentLoaded", () => {
       isRecording = false;
       recordButton.classList.remove("recording");
       recordButton.setAttribute("aria-pressed", "false");
-      recordButton.textContent = "● 4K 녹화";
+      recordButton.textContent = "● 페이지 녹화";
     };
 
     mediaRecorder.start(1000); // 1-second chunks
     isRecording = true;
     recordButton.classList.add("recording");
     recordButton.setAttribute("aria-pressed", "true");
-    recordButton.textContent = "■ 녹화 중지 (저장)";
+    recordButton.textContent = "■ 녹화 중지 (다운로드)";
   }
 
   function stopRecording() {
