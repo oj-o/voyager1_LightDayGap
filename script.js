@@ -156,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSceneIndex = -1;
   let audio = null;
   let soundOn = false;
-  let narrationVoice = null;
 
   function resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -201,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
     sceneMeta.textContent = scene.meta;
     captionText.textContent = Array.isArray(scene.caption) ? scene.caption.join("\n") : scene.caption;
     if (simpleHudText) simpleHudText.textContent = scene.hud;
-    speakScene(index);
     document.querySelectorAll(".chapter-marker").forEach((button, buttonIndex) => {
       button.classList.toggle("active", buttonIndex === index);
       button.setAttribute("aria-current", buttonIndex === index ? "true" : "false");
@@ -543,7 +541,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     low.type = "sine"; high.type = "triangle";
     low.frequency.value = 52; high.frequency.value = 104;
-    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .08;
+    // Keep the ambience clearly audible on normal laptop speakers.
+    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .25;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
@@ -553,41 +552,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return audio;
   }
 
-  function selectKoreanVoice() {
-    if (!("speechSynthesis" in window)) return null;
-    const voices = window.speechSynthesis.getVoices();
-    narrationVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith("ko")) || null;
-    return narrationVoice;
-  }
-
-  function speakScene(index) {
-    if (!soundOn || !("speechSynthesis" in window) || index < 0) return;
-    const scene = SCENES[index];
-    const text = Array.isArray(scene.caption) ? scene.caption.join(" ") : scene.caption;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ko-KR";
-    // Use a higher pitch and slightly slower delivery for a child-like profile.
-    utterance.rate = 0.88;
-    utterance.pitch = 1.5;
-    utterance.volume = 0.5;
-    utterance.voice = narrationVoice || selectKoreanVoice();
-    window.speechSynthesis.speak(utterance);
-  }
-
-  if ("speechSynthesis" in window) {
-    selectKoreanVoice();
-    window.speechSynthesis.addEventListener("voiceschanged", selectKoreanVoice);
-  }
-
   function updateAudio(index, opacity) {
     if (!audio) return;
     const now = audio.context.currentTime;
     const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
     audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
-    audio.lowGain.gain.setTargetAtTime(soundOn ? .04125 * opacity : .0001, now, .12);
-    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .0165 : .00825) * opacity : .0001, now, .12);
+    const audibleOpacity = Math.max(opacity, .35);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .14 * audibleOpacity : .0001, now, .12);
+    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .056 : .028) * audibleOpacity : .0001, now, .12);
   }
 
   function toggleSound() {
@@ -596,15 +569,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sound) {
       if (sound.context.state === "suspended") sound.context.resume();
       const opacity = presentationOpacity(filmTime);
-      sound.lowGain.gain.setTargetAtTime(soundOn ? .04125 * opacity : .0001, sound.context.currentTime, .18);
-      sound.highGain.gain.setTargetAtTime(soundOn ? .00825 * opacity : .0001, sound.context.currentTime, .18);
+      const audibleOpacity = Math.max(opacity, .35);
+      sound.lowGain.gain.setTargetAtTime(soundOn ? .14 * audibleOpacity : .0001, sound.context.currentTime, .18);
+      sound.highGain.gain.setTargetAtTime(soundOn ? .028 * audibleOpacity : .0001, sound.context.currentTime, .18);
     }
-    if (soundOn) {
-      speakScene(currentSceneIndex);
-    } else if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-    muteButton.textContent = soundOn ? "나레이션 끄기" : "어린이 나레이션 켜기";
+    muteButton.textContent = soundOn ? "배경음 끄기" : "배경음 켜기";
     muteButton.setAttribute("aria-pressed", String(soundOn));
   }
 
