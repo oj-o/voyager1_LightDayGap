@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 15,
       title: "프롤로그 · 하루의 틈",
       meta: "시작 화면 · 작품 개요 · 4K UHD",
-      caption: "먼 곳의 지금은 이미 과거다.",
+      caption: ["먼 곳의 지금은 이미 과거다.", "빛이 도착하는 순간, 현재는 기억이 된다."],
       hud: "VOYAGER 1 — LIGHT DAY GAP · 4K UHD · FORMAT MP4"
     },
     {
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 30,
       title: "어둠 속의 신호",
       meta: "259억 km 심연 · 가상 수신 사건",
-      caption: "어제의 신호가 오늘 닿는다.",
+      caption: ["어제 지구가 보낸 인사가 오늘 내 안테나에 닿는다.", "나는 늦게 도착한 목소리로 고향을 만난다."],
       hud: "지구와의 거리: 1광일 (259억 km) · 신호 지연: 약 24시간"
     },
     {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 60,
       title: "떠나온 49년의 궤적",
       meta: "1977 발사 → 목성·토성 → 태양계 탈출",
-      caption: "나는 중력을 빌려 떠났다.",
+      caption: ["나는 행성들의 중력을 빌려 더 멀리 떠났다.", "한 번의 스침이 나의 길을 성간의 어둠으로 바꾸었다."],
       hud: "항행 속도: 초속 약 17 km · 황도면 위쪽으로 비행 중"
     },
     {
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 85,
       title: "마지막으로 본 집",
       meta: "1990 창백한 푸른 점 이후 카메라 영구 정지",
-      caption: "지구는 작은 빛이 되었다.",
+      caption: ["마지막으로 돌아본 지구는 작은 빛이 되었다.", "멀어질수록 집은 점이 되고, 기억은 더 선명해진다."],
       hud: "지구의 겉보기 크기: 0.1015 초각 (극미세 점광원)"
     },
     {
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 120,
       title: "1광일의 심연",
       meta: "빛으로 하루 걸리는 거리 · 259억 km",
-      caption: "빛이 하루 걸리는 거리.",
+      caption: ["빛조차 하루를 건너야 하는 거리.", "내가 보는 지구는 언제나 어제의 모습이다."],
       hud: "1광일 = 25,902,068,371 km (약 173.1 AU)"
     },
     {
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 150,
       title: "두 장소의 하루",
       meta: "보이저의 하루 147만 km · 지구의 하루 257만 km",
-      caption: "서로 다른 하루를 건넌다.",
+      caption: ["같은 하루에도 우리는 서로 다른 길을 건넌다.", "나는 앞으로, 지구는 태양 곁으로 계속 움직인다."],
       hud: "지구 공전: 257만 km/일 · 보이저 항행: 147만 km/일"
     },
     {
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 175,
       title: "엇갈리는 시계",
       meta: "상대론적 시공간 · 흐르는 시간의 차이",
-      caption: "멀어질수록 시계가 어긋난다.",
+      caption: ["멀어질수록 우리의 시계는 아주 조금 어긋난다.", "공간의 틈이 시간의 틈으로도 번져간다."],
       hud: "특수상대론 시계 차이: 매일 약 139마이크로초"
     },
     {
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 195,
       title: "성간의 떨림",
       meta: "플라스마파(PWS) 관측 · 눈을 감은 뒤의 귀",
-      caption: "성간의 떨림을 듣는다.",
+      caption: ["카메라는 꺼졌지만, 나는 아직 듣고 있다.", "성간의 미세한 떨림이 어둠 속에서 길을 알려준다."],
       hud: "플라스마 전자 진동 주파수: 2.2 ~ 3.0 kHz 계측"
     },
     {
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 212,
       title: "원자의 심박수",
       meta: "RTG 플루토늄-238 붕괴열 · 미세한 생명선",
-      caption: "작은 원자가 신호를 만든다.",
+      caption: ["작은 원자들이 내 안에서 마지막 온기를 낸다.", "그 희미한 힘이 지구를 향한 한 줄의 신호가 된다."],
       hud: "RTG 원자력 전원: 20와트 미약한 전파로 송신"
     },
     {
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
       end: 225,
       title: "내일로 보내는 응답",
       meta: "보이저 가상 시선 · 어제의 지구를 향하여",
-      caption: "내 오늘은 내일 닿는다.",
+      caption: ["내가 보낸 오늘은 내일의 지구에 닿을 것이다.", "같은 현재를 볼 수 없어도, 우리의 신호는 이어진다."],
       hud: "VOYAGER 1 — 1 LIGHT-DAY PASSING · 2026"
     }
   ];
