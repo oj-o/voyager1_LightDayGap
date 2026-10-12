@@ -156,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSceneIndex = -1;
   let audio = null;
   let soundOn = false;
+  let narrationVoice = null;
 
   function resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -200,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sceneMeta.textContent = scene.meta;
     captionText.textContent = Array.isArray(scene.caption) ? scene.caption.join("\n") : scene.caption;
     if (simpleHudText) simpleHudText.textContent = scene.hud;
+    speakScene(index);
     document.querySelectorAll(".chapter-marker").forEach((button, buttonIndex) => {
       button.classList.toggle("active", buttonIndex === index);
       button.setAttribute("aria-current", buttonIndex === index ? "true" : "false");
@@ -551,6 +553,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return audio;
   }
 
+  function selectKoreanVoice() {
+    if (!("speechSynthesis" in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    narrationVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith("ko")) || null;
+    return narrationVoice;
+  }
+
+  function speakScene(index) {
+    if (!soundOn || !("speechSynthesis" in window) || index < 0) return;
+    const scene = SCENES[index];
+    const text = Array.isArray(scene.caption) ? scene.caption.join(" ") : scene.caption;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "ko-KR";
+    utterance.rate = 0.9;
+    utterance.pitch = 1.28;
+    utterance.volume = 1;
+    utterance.voice = narrationVoice || selectKoreanVoice();
+    window.speechSynthesis.speak(utterance);
+  }
+
+  if ("speechSynthesis" in window) {
+    selectKoreanVoice();
+    window.speechSynthesis.addEventListener("voiceschanged", selectKoreanVoice);
+  }
+
   function updateAudio(index, opacity) {
     if (!audio) return;
     const now = audio.context.currentTime;
@@ -562,13 +590,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleSound() {
-    const sound = ensureAudio(); if (!sound) return;
+    const sound = ensureAudio();
     soundOn = !soundOn;
-    if (sound.context.state === "suspended") sound.context.resume();
-    const opacity = presentationOpacity(filmTime);
-    sound.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, sound.context.currentTime, .18);
-    sound.highGain.gain.setTargetAtTime(soundOn ? .011 * opacity : .0001, sound.context.currentTime, .18);
-    muteButton.textContent = soundOn ? "소리 끄기" : "소리 켜기";
+    if (sound) {
+      if (sound.context.state === "suspended") sound.context.resume();
+      const opacity = presentationOpacity(filmTime);
+      sound.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, sound.context.currentTime, .18);
+      sound.highGain.gain.setTargetAtTime(soundOn ? .011 * opacity : .0001, sound.context.currentTime, .18);
+    }
+    if (soundOn) {
+      speakScene(currentSceneIndex);
+    } else if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    muteButton.textContent = soundOn ? "나레이션 끄기" : "어린이 나레이션 켜기";
     muteButton.setAttribute("aria-pressed", String(soundOn));
   }
 
@@ -750,6 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
       introScreen.classList.add("hidden");
       filmTime = 0;
       playing = true;
+      if (!soundOn) toggleSound();
       syncTransport();
     });
   }
