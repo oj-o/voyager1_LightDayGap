@@ -586,8 +586,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
     audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
-    audio.lowGain.gain.setTargetAtTime(soundOn ? .0275 * opacity : .0001, now, .12);
-    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .011 : .0055) * opacity : .0001, now, .12);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .04125 * opacity : .0001, now, .12);
+    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .0165 : .00825) * opacity : .0001, now, .12);
   }
 
   function toggleSound() {
@@ -596,8 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sound) {
       if (sound.context.state === "suspended") sound.context.resume();
       const opacity = presentationOpacity(filmTime);
-      sound.lowGain.gain.setTargetAtTime(soundOn ? .0275 * opacity : .0001, sound.context.currentTime, .18);
-      sound.highGain.gain.setTargetAtTime(soundOn ? .0055 * opacity : .0001, sound.context.currentTime, .18);
+      sound.lowGain.gain.setTargetAtTime(soundOn ? .04125 * opacity : .0001, sound.context.currentTime, .18);
+      sound.highGain.gain.setTargetAtTime(soundOn ? .00825 * opacity : .0001, sound.context.currentTime, .18);
     }
     if (soundOn) {
       speakScene(currentSceneIndex);
@@ -772,6 +772,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playButton.addEventListener("click", () => {
     if (filmTime >= DURATION_S) filmTime = 0;
+    if (!soundOn) toggleSound();
     playing = !playing;
     syncTransport();
   });
