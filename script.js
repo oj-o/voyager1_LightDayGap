@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const LEAD_OUT_BLACK_S = 5;
   const FADE_IN_S = 1;
   const FADE_OUT_S = 1;
+  const AUDIO_FADE_S = 5;
   const DURATION_S = LEAD_IN_BLACK_S + CONTENT_DURATION_S + LEAD_OUT_BLACK_S; // 3 minutes 55 seconds
   const FPS = 30;
   const LAST_FRAME_S = DURATION_S - (1 / FPS);
@@ -155,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastTick = performance.now();
   let currentSceneIndex = -1;
   let audio = null;
-  let soundOn = false;
+  let soundOn = true;
 
   function resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -177,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fadeOut = FADE_OUT_S ? Math.min(1, (CONTENT_DURATION_S - storyTime) / FADE_OUT_S) : 1;
     return Math.min(fadeIn, fadeOut);
   };
+  const audioOpacity = (time) => Math.min(1, time / AUDIO_FADE_S, (DURATION_S - time) / AUDIO_FADE_S);
   const mix = (a, b, amount) => a + (b - a) * amount;
   const smoothstep = (start, end, value) => { const x = clamp((value - start) / (end - start)); return x * x * (3 - 2 * x); };
   const easeInOut = (value) => value < 0.5 ? 2 * value * value : 1 - Math.pow(-2 * value + 2, 2) / 2;
@@ -540,9 +542,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const highGain = audioContext.createGain();
 
     low.type = "sine"; high.type = "triangle";
-    low.frequency.value = 52; high.frequency.value = 104;
-    // Keep the ambience clearly audible on normal laptop speakers.
-    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .25;
+    low.frequency.value = 196; high.frequency.value = 294;
+    // Keep the ambience in a comfortable mid-range band for long viewing.
+    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .16;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
@@ -555,26 +557,24 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateAudio(index, opacity) {
     if (!audio) return;
     const now = audio.context.currentTime;
-    const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
+    const root = [196, 196, 220, 185, 196, 233, 174, 247, 165, 196][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
-    audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
-    const audibleOpacity = Math.max(opacity, .35);
-    audio.lowGain.gain.setTargetAtTime(soundOn ? .14 * audibleOpacity : .0001, now, .12);
-    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .056 : .028) * audibleOpacity : .0001, now, .12);
+    audio.high.frequency.setTargetAtTime(root * 1.5, now, .45);
+    const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .08 * audibleOpacity : .0001, now, .12);
+    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .03 : .02) * audibleOpacity : .0001, now, .12);
   }
 
-  function toggleSound() {
+  function activateSound() {
     const sound = ensureAudio();
-    soundOn = !soundOn;
-    if (sound) {
-      if (sound.context.state === "suspended") sound.context.resume();
-      const opacity = presentationOpacity(filmTime);
-      const audibleOpacity = Math.max(opacity, .35);
-      sound.lowGain.gain.setTargetAtTime(soundOn ? .14 * audibleOpacity : .0001, sound.context.currentTime, .18);
-      sound.highGain.gain.setTargetAtTime(soundOn ? .028 * audibleOpacity : .0001, sound.context.currentTime, .18);
-    }
-    muteButton.textContent = soundOn ? "배경음 끄기" : "배경음 켜기";
-    muteButton.setAttribute("aria-pressed", String(soundOn));
+    if (!sound) return;
+    soundOn = true;
+    if (sound.context.state === "suspended") sound.context.resume();
+    const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
+    sound.lowGain.gain.setTargetAtTime(.08 * audibleOpacity, sound.context.currentTime, .18);
+    sound.highGain.gain.setTargetAtTime(.02 * audibleOpacity, sound.context.currentTime, .18);
+    muteButton.textContent = "배경음 항상 켜짐";
+    muteButton.setAttribute("aria-pressed", "true");
   }
 
   function toggleDomeMode() {
@@ -741,11 +741,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playButton.addEventListener("click", () => {
     if (filmTime >= DURATION_S) filmTime = 0;
-    if (!soundOn) toggleSound();
+    activateSound();
     playing = !playing;
     syncTransport();
   });
-  muteButton.addEventListener("click", toggleSound);
   if (domeButton) domeButton.addEventListener("click", toggleDomeMode);
   if (recordButton) recordButton.addEventListener("click", toggleRecording);
   timeline.addEventListener("input", () => { filmTime = Number(timeline.value); playing = false; syncTransport(); });
@@ -756,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
       introScreen.classList.add("hidden");
       filmTime = 0;
       playing = true;
-      if (!soundOn) toggleSound();
+      activateSound();
       syncTransport();
     });
   }
