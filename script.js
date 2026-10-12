@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     low.type = "sine"; high.type = "triangle";
     low.frequency.value = 52; high.frequency.value = 104;
-    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .16;
+    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .08;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
@@ -567,9 +567,10 @@ document.addEventListener("DOMContentLoaded", () => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "ko-KR";
-    utterance.rate = 0.9;
-    utterance.pitch = 1.28;
-    utterance.volume = 1;
+    // Use a higher pitch and slightly slower delivery for a child-like profile.
+    utterance.rate = 0.88;
+    utterance.pitch = 1.5;
+    utterance.volume = 0.5;
     utterance.voice = narrationVoice || selectKoreanVoice();
     window.speechSynthesis.speak(utterance);
   }
@@ -585,8 +586,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = [52, 52, 58, 49, 55, 62, 47, 66, 43, 52][index];
     audio.low.frequency.setTargetAtTime(root, now, .35);
     audio.high.frequency.setTargetAtTime(root * 2.01, now, .45);
-    audio.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, now, .12);
-    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .022 : .011) * opacity : .0001, now, .12);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .0275 * opacity : .0001, now, .12);
+    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .011 : .0055) * opacity : .0001, now, .12);
   }
 
   function toggleSound() {
@@ -595,8 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sound) {
       if (sound.context.state === "suspended") sound.context.resume();
       const opacity = presentationOpacity(filmTime);
-      sound.lowGain.gain.setTargetAtTime(soundOn ? .055 * opacity : .0001, sound.context.currentTime, .18);
-      sound.highGain.gain.setTargetAtTime(soundOn ? .011 * opacity : .0001, sound.context.currentTime, .18);
+      sound.lowGain.gain.setTargetAtTime(soundOn ? .0275 * opacity : .0001, sound.context.currentTime, .18);
+      sound.highGain.gain.setTargetAtTime(soundOn ? .0055 * opacity : .0001, sound.context.currentTime, .18);
     }
     if (soundOn) {
       speakScene(currentSceneIndex);
