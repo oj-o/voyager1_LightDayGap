@@ -544,21 +544,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const low = audioContext.createOscillator();
     const high = audioContext.createOscillator();
     const sparkle = audioContext.createOscillator();
+    const motionLfo = audioContext.createOscillator();
+    const motionDepth = audioContext.createGain();
     const lowGain = audioContext.createGain();
     const highGain = audioContext.createGain();
     const sparkleGain = audioContext.createGain();
+    const panner = audioContext.createStereoPanner ? audioContext.createStereoPanner() : null;
 
     low.type = "sine"; high.type = "triangle"; sparkle.type = "sine";
     low.frequency.value = 220; high.frequency.value = 330; sparkle.frequency.value = 660;
+    motionLfo.frequency.value = .07;
+    motionDepth.gain.value = .18;
     // A quiet, brighter mid-range bed: airy enough to suggest drifting in space.
     lowGain.gain.value = .0001; highGain.gain.value = .0001; sparkleGain.gain.value = .0001; master.gain.value = .22;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
     sparkle.connect(sparkleGain).connect(master);
-    master.connect(audioContext.destination);
-    low.start(); high.start(); sparkle.start();
-    audio = { context: audioContext, low, high, sparkle, lowGain, highGain, sparkleGain };
+    if (panner) {
+      master.connect(panner).connect(audioContext.destination);
+      motionLfo.connect(motionDepth).connect(panner.pan);
+    } else {
+      master.connect(audioContext.destination);
+    }
+    low.start(); high.start(); sparkle.start(); motionLfo.start();
+    audio = { context: audioContext, low, high, sparkle, lowGain, highGain, sparkleGain, master, output: panner || master, motionLfo, motionDepth };
     return audio;
   }
 
@@ -569,6 +579,8 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.low.frequency.setTargetAtTime(root, now, .8);
     audio.high.frequency.setTargetAtTime(root * 1.5, now, 1.1);
     audio.sparkle.frequency.setTargetAtTime(root * 3, now, 1.4);
+    audio.motionLfo.frequency.setTargetAtTime(.055 + index * .006, now, 1.5);
+    audio.motionDepth.gain.setTargetAtTime(soundOn ? .18 : 0, now, .8);
     const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
     audio.lowGain.gain.setTargetAtTime(soundOn ? .045 * audibleOpacity : .0001, now, .2);
     audio.highGain.gain.setTargetAtTime(soundOn ? .012 * audibleOpacity : .0001, now, .25);
@@ -616,8 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (audio && audio.context) {
       try {
         const dest = audio.context.createMediaStreamDestination();
-        audio.lowGain.connect(dest);
-        audio.highGain.connect(dest);
+        audio.output.connect(dest);
         const audioTracks = dest.stream.getAudioTracks();
         if (audioTracks.length > 0) {
           stream.addTrack(audioTracks[0]);
