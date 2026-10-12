@@ -22,3 +22,6 @@ output/audio/*.wav
 Thumbs.db
 .vscode/
 .idea/
+
+# Legacy nested copy; the deployable site lives at repository root.
+voyager1_LightDayGap/
