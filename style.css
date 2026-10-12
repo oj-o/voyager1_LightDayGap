@@ -33,15 +33,15 @@ h1 span { color: var(--gold); font-weight: 400; }
 .science-note strong { color: var(--ink); font-weight: 600; }
 .status-dot { background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px rgba(216, 183, 120, .75); height: .46rem; margin-top: .35rem; width: .46rem; }
 .status-dot.connected { background: var(--cyan); box-shadow: 0 0 12px rgba(104, 216, 232, .9); }
-.caption { bottom: clamp(5.5rem, 12.5vh, 8rem); left: 50%; max-width: min(48rem, 88vw); text-align: center; transform: translateX(-50%); width: min(48rem, 88vw); }
-.caption p { color: #f5fcff; font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 600; line-height: 1.42; margin: 0; text-shadow: 0 2px 26px #000, 0 0 3px #000; white-space: pre-line; -webkit-text-stroke: .015em rgba(3, 6, 11, .55); }
+.caption { bottom: clamp(5.5rem, 12.5vh, 8rem); left: 50%; max-width: min(64rem, 86vw); text-align: center; transform: translateX(-50%); width: min(64rem, 86vw); }
+.caption p { color: #f5fcff; font-size: clamp(1.33rem, 2.4vw, 2.05rem); font-weight: 600; line-height: 1.48; margin: 0; text-shadow: 0 2px 26px #000, 0 0 3px #000; white-space: pre-line; -webkit-text-stroke: .015em rgba(3, 6, 11, .55); }
 .caption .simple-hud { display: none; }
-.experience.dome-active .caption { background: linear-gradient(90deg, rgba(3, 6, 11, 0), rgba(3, 6, 11, .86) 12%, rgba(3, 6, 11, .86) 88%, rgba(3, 6, 11, 0)); bottom: clamp(8.75rem, 17vh, 12rem); left: 50%; max-width: min(48rem, 68vw); padding: .7rem 1.4rem .85rem; top: auto; transform: translateX(-50%); width: min(48rem, 68vw); }
-.experience.dome-active .caption p { font-size: clamp(1.65rem, 2.9vw, 2.6rem); line-height: 1.4; }
+.experience.dome-active .caption { background: linear-gradient(90deg, rgba(3, 6, 11, 0), rgba(3, 6, 11, .86) 12%, rgba(3, 6, 11, .86) 88%, rgba(3, 6, 11, 0)); bottom: clamp(8.75rem, 17vh, 12rem); left: 50%; max-width: min(58rem, 78vw); padding: .6rem 1.2rem .72rem; top: auto; transform: translateX(-50%); width: min(58rem, 78vw); }
+.experience.dome-active .caption p { font-size: clamp(1.1rem, 1.93vw, 1.73rem); line-height: 1.46; }
 .experience.dome-active .caption .simple-hud { display: none; }
 .control-dock { backdrop-filter: blur(12px); background: linear-gradient(180deg, rgba(3, 6, 11, 0), var(--panel) 35%); bottom: 0; left: 0; padding: 1.2rem clamp(1.25rem, 3.2vw, 4rem) 1.4rem; right: 0; }
 .transport { align-items: center; display: flex; gap: .65rem; margin-bottom: .8rem; }
-.transport button { background: rgba(104, 216, 232, .08); border: 1px solid rgba(104, 216, 232, .35); border-radius: 99px; color: var(--ink); cursor: pointer; font-size: .92rem; padding: .48rem .85rem; transition: all .2s ease; }
+.transport button { background: rgba(104, 216, 232, .08); border: 1px solid rgba(104, 216, 232, .35); border-radius: 99px; color: var(--ink); cursor: pointer; font-size: .72rem; padding: .4rem .72rem; transition: all .2s ease; }
 .transport button:hover, .transport button:focus-visible { background: rgba(104, 216, 232, .18); outline: 2px solid var(--cyan); outline-offset: 2px; }
 .transport button.btn-dome.active { background: rgba(216, 183, 120, .25); border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(216, 183, 120, 0.4); }
 .record-group { display: flex; align-items: center; background: rgba(8, 20, 32, 0.6); border: 1px solid rgba(104, 216, 232, 0.28); border-radius: 99px; padding: 2px; }
@@ -60,7 +60,7 @@ h1 span { color: var(--gold); font-weight: 400; }
 .scrubber-label { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
 #timeline { accent-color: var(--cyan); cursor: pointer; display: block; height: 1rem; margin: 0; width: 100%; }
 .chapter-markers { display: grid; gap: .35rem; grid-template-columns: repeat(10, 1fr); margin-top: .5rem; }
-.chapter-marker { background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--muted); cursor: pointer; font-family: "DM Mono", ui-monospace, monospace; font-size: clamp(.7rem, .9vw, .9rem); overflow: hidden; padding: .46rem 0 0; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.chapter-marker { background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--muted); cursor: pointer; font-family: "DM Mono", ui-monospace, monospace; font-size: clamp(.5rem, .6vw, .6rem); overflow: hidden; padding: .38rem 0 0; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .chapter-marker:hover, .chapter-marker:focus-visible, .chapter-marker.active { border-top-color: var(--gold); color: var(--gold); outline: none; }
 @media (max-width: 900px) { .record-select, .record-format-select { display: none; } .record-group { border: none; background: none; } }
 @media (max-width: 650px) { .science-note { display: none; } .readout { bottom: 8.4rem; max-width: 74vw; } .caption { bottom: 5.5rem; } .chapter-marker { font-size: .5rem; } .transport button { padding: .34rem .55rem; } }

@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = baseline;
-    const displaySize = size * 2;
+    const displaySize = size * 1.33;
     ctx.font = family === "mono" ? mono(displaySize) : font(displaySize, weight);
     ctx.lineJoin = "round";
     ctx.strokeStyle = "rgba(3, 6, 11, .82)";
