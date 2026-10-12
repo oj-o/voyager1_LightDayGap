@@ -542,9 +542,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const highGain = audioContext.createGain();
 
     low.type = "sine"; high.type = "triangle";
-    low.frequency.value = 196; high.frequency.value = 294;
-    // Keep the ambience in a comfortable mid-range band for long viewing.
-    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .16;
+    low.frequency.value = 220; high.frequency.value = 330;
+    // A quiet, brighter mid-range bed: airy enough to suggest drifting in space.
+    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .18;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
@@ -557,12 +557,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateAudio(index, opacity) {
     if (!audio) return;
     const now = audio.context.currentTime;
-    const root = [196, 196, 220, 185, 196, 233, 174, 247, 165, 196][index];
-    audio.low.frequency.setTargetAtTime(root, now, .35);
-    audio.high.frequency.setTargetAtTime(root * 1.5, now, .45);
+    const root = [220, 247, 262, 294, 330, 294, 262, 247, 220, 247][index];
+    audio.low.frequency.setTargetAtTime(root, now, .8);
+    audio.high.frequency.setTargetAtTime(root * 1.5, now, 1.1);
     const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
-    audio.lowGain.gain.setTargetAtTime(soundOn ? .08 * audibleOpacity : .0001, now, .12);
-    audio.highGain.gain.setTargetAtTime(soundOn ? (index === 7 ? .03 : .02) * audibleOpacity : .0001, now, .12);
+    audio.lowGain.gain.setTargetAtTime(soundOn ? .045 * audibleOpacity : .0001, now, .2);
+    audio.highGain.gain.setTargetAtTime(soundOn ? .012 * audibleOpacity : .0001, now, .25);
   }
 
   function activateSound() {
@@ -571,8 +571,8 @@ document.addEventListener("DOMContentLoaded", () => {
     soundOn = true;
     if (sound.context.state === "suspended") sound.context.resume();
     const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
-    sound.lowGain.gain.setTargetAtTime(.08 * audibleOpacity, sound.context.currentTime, .18);
-    sound.highGain.gain.setTargetAtTime(.02 * audibleOpacity, sound.context.currentTime, .18);
+    sound.lowGain.gain.setTargetAtTime(.045 * audibleOpacity, sound.context.currentTime, .2);
+    sound.highGain.gain.setTargetAtTime(.012 * audibleOpacity, sound.context.currentTime, .25);
     muteButton.textContent = "배경음 항상 켜짐";
     muteButton.setAttribute("aria-pressed", "true");
   }
