@@ -231,7 +231,12 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = baseline;
-    ctx.font = family === "mono" ? mono(size) : font(size, weight);
+    const displaySize = size * 1.12;
+    ctx.font = family === "mono" ? mono(displaySize) : font(displaySize, weight);
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(3, 6, 11, .82)";
+    ctx.lineWidth = Math.max(1.5, displaySize * .055);
+    ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);
     ctx.restore();
   }
@@ -275,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isDomeMode && Math.hypot(x - width * 0.5, y - height * 0.5) > domeR) continue;
       const strength = .12 + hash(i + 9) * .55;
       const blink = .7 + Math.sin(time * (.18 + hash(i + 13) * .6) + i) * .15;
-      circle(x, y, .3 + hash(i + 17) * 1.1, "#d8e8ed", strength * blink);
+      circle(x, y, .4 + hash(i + 17) * 1.45, "#d8e8ed", strength * blink);
     }
   }
 
@@ -286,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = COLORS.gold;
     ctx.fillStyle = "rgba(216, 183, 120, .2)";
-    ctx.lineWidth = 1.4;
+    ctx.lineWidth = 2;
     ctx.beginPath(); ctx.ellipse(0, -9, 25, 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-14, 34); ctx.lineTo(18, 34); ctx.closePath(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(2, 5); ctx.lineTo(2, 51); ctx.stroke();
@@ -295,10 +300,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawSignal(x1, y1, x2, y2, progress, color, label) {
-    line(x1, y1, x2, y2, color, .28, 1, [4, 7]);
+    line(x1, y1, x2, y2, color, .38, 1.8, [5, 8]);
     const x = mix(x1, x2, progress);
     const y = mix(y1, y2, progress);
-    circle(x, y, 4, color, 1, 20);
+    circle(x, y, 5, color, 1, 24);
     if (label) drawText(label, mix(x1, x2, .5), mix(y1, y2, .5) - 12, { align: "center", color, size: 10, family: "mono" });
   }
 
@@ -511,7 +516,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dome altitude grid lines
     ctx.strokeStyle = COLORS.domeGrid;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.6;
     [0.33, 0.66, 1.0].forEach((ratio, idx) => {
       ctx.beginPath();
       ctx.arc(cx, cy, r * ratio, 0, Math.PI * 2);
