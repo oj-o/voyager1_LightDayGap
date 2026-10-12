@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = baseline;
-    const displaySize = size * 1.12;
+    const displaySize = size * 2;
     ctx.font = family === "mono" ? mono(displaySize) : font(displaySize, weight);
     ctx.lineJoin = "round";
     ctx.strokeStyle = "rgba(3, 6, 11, .82)";
@@ -543,19 +543,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const master = audioContext.createGain();
     const low = audioContext.createOscillator();
     const high = audioContext.createOscillator();
+    const sparkle = audioContext.createOscillator();
     const lowGain = audioContext.createGain();
     const highGain = audioContext.createGain();
+    const sparkleGain = audioContext.createGain();
 
-    low.type = "sine"; high.type = "triangle";
-    low.frequency.value = 220; high.frequency.value = 330;
+    low.type = "sine"; high.type = "triangle"; sparkle.type = "sine";
+    low.frequency.value = 220; high.frequency.value = 330; sparkle.frequency.value = 660;
     // A quiet, brighter mid-range bed: airy enough to suggest drifting in space.
-    lowGain.gain.value = .0001; highGain.gain.value = .0001; master.gain.value = .18;
+    lowGain.gain.value = .0001; highGain.gain.value = .0001; sparkleGain.gain.value = .0001; master.gain.value = .22;
 
     low.connect(lowGain).connect(master);
     high.connect(highGain).connect(master);
+    sparkle.connect(sparkleGain).connect(master);
     master.connect(audioContext.destination);
-    low.start(); high.start();
-    audio = { context: audioContext, low, high, lowGain, highGain };
+    low.start(); high.start(); sparkle.start();
+    audio = { context: audioContext, low, high, sparkle, lowGain, highGain, sparkleGain };
     return audio;
   }
 
@@ -565,9 +568,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = [220, 247, 262, 294, 330, 294, 262, 247, 220, 247][index];
     audio.low.frequency.setTargetAtTime(root, now, .8);
     audio.high.frequency.setTargetAtTime(root * 1.5, now, 1.1);
+    audio.sparkle.frequency.setTargetAtTime(root * 3, now, 1.4);
     const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
     audio.lowGain.gain.setTargetAtTime(soundOn ? .045 * audibleOpacity : .0001, now, .2);
     audio.highGain.gain.setTargetAtTime(soundOn ? .012 * audibleOpacity : .0001, now, .25);
+    audio.sparkleGain.gain.setTargetAtTime(soundOn ? .006 * audibleOpacity : .0001, now, .3);
   }
 
   function activateSound() {
@@ -578,6 +583,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const audibleOpacity = Math.max(audioOpacity(filmTime), .35);
     sound.lowGain.gain.setTargetAtTime(.045 * audibleOpacity, sound.context.currentTime, .2);
     sound.highGain.gain.setTargetAtTime(.012 * audibleOpacity, sound.context.currentTime, .25);
+    sound.sparkleGain.gain.setTargetAtTime(.006 * audibleOpacity, sound.context.currentTime, .3);
     muteButton.textContent = "배경음 항상 켜짐";
     muteButton.setAttribute("aria-pressed", "true");
   }
@@ -750,6 +756,9 @@ document.addEventListener("DOMContentLoaded", () => {
     playing = !playing;
     syncTransport();
   });
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target instanceof Element && event.target.closest("button, input, select")) activateSound();
+  }, { capture: true });
   if (domeButton) domeButton.addEventListener("click", toggleDomeMode);
   if (recordButton) recordButton.addEventListener("click", toggleRecording);
   timeline.addEventListener("input", () => { filmTime = Number(timeline.value); playing = false; syncTransport(); });
